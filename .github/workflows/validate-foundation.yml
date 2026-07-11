@@ -6,14 +6,17 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out pull request branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -41,9 +44,11 @@ jobs:
       - name: Build application
         run: pnpm build
 
-      - name: Upload synchronized lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: synchronized-lockfile
-          path: pnpm-lock.yaml
-          if-no-files-found: error
+      - name: Commit synchronized lockfile
+        run: |
+          git config user.name "emranyounasdxb-ai"
+          git config user.email "292407963+emranyounasdxb-ai@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git rm .github/workflows/validate-foundation.yml
+          git commit -m "Synchronize the dependency lockfile"
+          git push origin HEAD:${{ github.head_ref }}
