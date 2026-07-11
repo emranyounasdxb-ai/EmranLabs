@@ -1,5 +1,8 @@
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { Ref } from "react";
+
+import { cardMotionVariants, motionTransitions } from "@/config/motion";
 
 import type { CreativeLab } from "@/types/portfolio";
 
@@ -16,7 +19,13 @@ export function CreativeLabCard({
 }: CreativeLabCardProps) {
   const Icon = lab.icon;
   return (
-    <article className="flex h-full flex-col rounded-[var(--radius-panel)] border border-[var(--glass-border)] bg-white/[0.04] p-4">
+    <motion.article
+      variants={cardMotionVariants}
+      initial="initial"
+      animate="animate"
+      transition={motionTransitions.standard}
+      className="flex h-full flex-col rounded-[var(--radius-panel)] border border-[var(--glass-border)] bg-white/[0.04] p-4"
+    >
       <div className="flex items-start justify-between gap-3">
         <span className="rounded-2xl border border-[var(--glass-border)] bg-white/[0.05] p-3 text-[var(--color-signal)]">
           <Icon aria-hidden="true" className="size-5" />
@@ -54,6 +63,6 @@ export function CreativeLabCard({
       >
         View details <ArrowRight aria-hidden="true" className="size-4" />
       </button>
-    </article>
+    </motion.article>
   );
 }

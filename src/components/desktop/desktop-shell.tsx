@@ -1,5 +1,9 @@
 "use client";
 
+import { useRef } from "react";
+
+import { DesktopMotionProvider } from "@/components/motion/motion-provider";
+import { useDesktopDepth } from "@/hooks/use-desktop-depth";
 import { useDesktopShortcuts } from "@/hooks/use-desktop-shortcuts";
 
 import { DesktopBackground } from "./desktop-background";
@@ -9,15 +13,22 @@ import { DesktopTopBar } from "./desktop-top-bar";
 import { DesktopWorkspace } from "./desktop-workspace";
 
 export function DesktopShell() {
+  const shellRef = useRef<HTMLDivElement>(null);
   useDesktopShortcuts();
+  useDesktopDepth(shellRef);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
-      <DesktopBackground />
-      <DesktopTopBar />
-      <DesktopWorkspace />
-      <DesktopDock />
-      <DesktopCommandCenter />
-    </div>
+    <DesktopMotionProvider>
+      <div
+        ref={shellRef}
+        className="relative min-h-screen overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)] [--desktop-depth-x:0px] [--desktop-depth-y:0px]"
+      >
+        <DesktopBackground />
+        <DesktopTopBar />
+        <DesktopWorkspace />
+        <DesktopDock />
+        <DesktopCommandCenter />
+      </div>
+    </DesktopMotionProvider>
   );
 }

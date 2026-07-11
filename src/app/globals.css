@@ -57,3 +57,86 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+.desktop-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at center, rgba(23, 227, 192, 0.12), transparent 48%);
+  background-position:
+    calc(var(--desktop-depth-x, 0px) * -0.22)
+      calc(var(--desktop-depth-y, 0px) * -0.22),
+    calc(var(--desktop-depth-x, 0px) * -0.22)
+      calc(var(--desktop-depth-y, 0px) * -0.22),
+    center;
+  background-size:
+    48px 48px,
+    48px 48px,
+    100% 100%;
+  mask-image: radial-gradient(circle at 50% 42%, black, transparent 76%);
+}
+
+.desktop-atmosphere {
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      rgba(23, 227, 192, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 72% 48%,
+      rgba(123, 92, 255, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(
+      115deg,
+      transparent 8%,
+      rgba(255, 255, 255, 0.04) 42%,
+      transparent 68%
+    );
+  filter: blur(8px);
+  transform: translate3d(
+    calc(var(--desktop-depth-x, 0px) * 0.16),
+    calc(var(--desktop-depth-y, 0px) * 0.16),
+    0
+  );
+}
+
+.desktop-scanline {
+  background-image: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 100% 9rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .desktop-atmosphere {
+    animation: desktop-atmosphere-drift 18s var(--motion-ease) infinite
+      alternate;
+  }
+
+  .desktop-scanline {
+    animation: desktop-scanline-drift 16s linear infinite;
+  }
+}
+
+@keyframes desktop-atmosphere-drift {
+  from {
+    opacity: 0.68;
+  }
+  to {
+    opacity: 0.88;
+  }
+}
+
+@keyframes desktop-scanline-drift {
+  from {
+    background-position-y: 0;
+  }
+  to {
+    background-position-y: 9rem;
+  }
+}

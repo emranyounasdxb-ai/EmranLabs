@@ -1,5 +1,8 @@
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { Ref } from "react";
+
+import { cardMotionVariants, motionTransitions } from "@/config/motion";
 
 import type { PortfolioProject } from "@/types/portfolio";
 
@@ -15,7 +18,13 @@ export function PortfolioProjectCard({
   onViewDetails,
 }: PortfolioProjectCardProps) {
   return (
-    <article className="flex h-full flex-col rounded-[var(--radius-panel)] border border-[var(--glass-border)] bg-white/[0.04] p-4">
+    <motion.article
+      variants={cardMotionVariants}
+      initial="initial"
+      animate="animate"
+      transition={motionTransitions.standard}
+      className="flex h-full flex-col rounded-[var(--radius-panel)] border border-[var(--glass-border)] bg-white/[0.04] p-4"
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs text-[var(--color-signal)]">
@@ -68,6 +77,6 @@ export function PortfolioProjectCard({
         View details
         <ArrowRight aria-hidden="true" className="size-4" />
       </button>
-    </article>
+    </motion.article>
   );
 }
