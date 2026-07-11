@@ -122,7 +122,7 @@ export function DesktopWindow({
       aria-modal="false"
       onPointerDown={onFocus}
       className={cn(
-        "fixed right-3 bottom-24 left-3 h-[calc(100dvh-7.5rem)] w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-7.5rem)] flex-col overflow-hidden rounded-[var(--radius-panel)] border bg-[rgba(21,23,30,0.86)] shadow-[var(--shadow-panel)] backdrop-blur-2xl transition-[border-color,box-shadow,opacity] duration-[var(--duration-standard)] ease-[var(--motion-ease)] lg:top-0 lg:right-auto lg:bottom-auto lg:left-0 lg:h-[min(var(--window-height),calc(100dvh-7.5rem))] lg:w-[min(var(--window-width),calc(100vw-1.5rem))] lg:translate-x-[var(--window-x)] lg:translate-y-[var(--window-y)]",
+        "fixed right-3 bottom-24 left-3 h-[calc(100dvh-7.5rem)] max-h-[calc(100dvh-7.5rem)] w-[calc(100vw-1.5rem)] flex-col overflow-hidden rounded-[var(--radius-panel)] border bg-[rgba(21,23,30,0.86)] shadow-[var(--shadow-panel)] backdrop-blur-2xl transition-[border-color,box-shadow,opacity] duration-[var(--duration-standard)] ease-[var(--motion-ease)] lg:top-0 lg:right-auto lg:bottom-auto lg:left-0 lg:h-[min(var(--window-height),calc(100dvh-7.5rem))] lg:w-[min(var(--window-width),calc(100vw-1.5rem))] lg:translate-x-[var(--window-x)] lg:translate-y-[var(--window-y)]",
         active ? "flex" : "hidden lg:flex",
       )}
       style={
