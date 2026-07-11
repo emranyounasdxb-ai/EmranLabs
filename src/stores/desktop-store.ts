@@ -25,6 +25,20 @@ type DesktopStore = {
   setDockVisible: (visible: boolean) => void;
 };
 
+const getTopVisibleWindowId = (
+  windows: DesktopStore["windows"],
+): DesktopAppId | null =>
+  Object.values(windows).reduce<DesktopWindowState | null>(
+    (topWindow, currentWindow) => {
+      if (!currentWindow || currentWindow.minimized) return topWindow;
+      if (!topWindow || currentWindow.zIndex > topWindow.zIndex) {
+        return currentWindow;
+      }
+      return topWindow;
+    },
+    null,
+  )?.appId ?? null;
+
 const createWindow = (
   appId: DesktopAppId,
   zIndex: number,
@@ -50,8 +64,17 @@ export const useDesktopStore = create<DesktopStore>((set, get) => ({
   nextZIndex: 20,
   dockVisible: true,
   openWindow: (appId) => {
-    const existingWindow = get().windows[appId];
-    const zIndex = get().nextZIndex;
+    const currentState = get();
+    const existingWindow = currentState.windows[appId];
+    const zIndex = currentState.nextZIndex;
+
+    if (
+      existingWindow &&
+      currentState.activeWindowId === appId &&
+      !existingWindow.minimized
+    ) {
+      return;
+    }
 
     if (existingWindow) {
       set((state) => ({
@@ -85,29 +108,43 @@ export const useDesktopStore = create<DesktopStore>((set, get) => ({
       return {
         windows: remainingWindows,
         activeWindowId:
-          state.activeWindowId === appId ? null : state.activeWindowId,
+          state.activeWindowId === appId
+            ? getTopVisibleWindowId(remainingWindows)
+            : state.activeWindowId,
       };
     }),
   minimizeWindow: (appId) =>
-    set((state) => ({
-      windows: state.windows[appId]
-        ? {
-            ...state.windows,
-            [appId]: { ...state.windows[appId], minimized: true },
-          }
-        : state.windows,
-      activeWindowId:
-        state.activeWindowId === appId ? null : state.activeWindowId,
-    })),
+    set((state) => {
+      const windowState = state.windows[appId];
+      if (!windowState) return state;
+
+      const windows = {
+        ...state.windows,
+        [appId]: { ...windowState, minimized: true },
+      };
+
+      return {
+        windows,
+        activeWindowId:
+          state.activeWindowId === appId
+            ? getTopVisibleWindowId(windows)
+            : state.activeWindowId,
+      };
+    }),
   restoreWindow: (appId) => get().openWindow(appId),
   focusWindow: (appId) => {
-    const windowState = get().windows[appId];
+    const currentState = get();
+    const windowState = currentState.windows[appId];
 
-    if (!windowState || windowState.minimized) {
+    if (
+      !windowState ||
+      windowState.minimized ||
+      currentState.activeWindowId === appId
+    ) {
       return;
     }
 
-    const zIndex = get().nextZIndex;
+    const zIndex = currentState.nextZIndex;
     set((state) => ({
       windows: {
         ...state.windows,
