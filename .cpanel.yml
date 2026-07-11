@@ -1,5 +1,0 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home/emranlabs/public_html/
-    - /usr/bin/rsync -av --exclude='.git/' --exclude='.cpanel.yml' ./ "$DEPLOYPATH"
