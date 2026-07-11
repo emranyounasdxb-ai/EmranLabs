@@ -46,8 +46,25 @@ jobs:
       - name: Run typecheck
         run: pnpm typecheck
 
-      - name: Check formatting
+      - name: Check desktop window formatting
+        run: pnpm exec prettier --check src/components/desktop/desktop-window.tsx
+
+      - name: Check desktop store formatting
+        if: always()
+        run: pnpm exec prettier --check src/stores/desktop-store.ts
+
+      - name: Check README formatting
+        if: always()
+        run: pnpm exec prettier --check README.md
+
+      - name: Check workflow formatting
+        if: always()
+        run: pnpm exec prettier --check .github/workflows/quality.yml
+
+      - name: Check project formatting
+        if: always()
         run: pnpm format:check
 
       - name: Build application
+        if: always()
         run: pnpm build
