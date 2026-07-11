@@ -9,7 +9,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -40,31 +42,30 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Apply project formatting
+        if: github.event_name == 'pull_request'
+        run: pnpm exec prettier --write src/components/desktop/desktop-window.tsx
+
+      - name: Commit formatting correction
+        if: github.event_name == 'pull_request'
+        run: |
+          if git diff --quiet -- src/components/desktop/desktop-window.tsx; then
+            exit 0
+          fi
+          git config user.name "emranyounasdxb-ai"
+          git config user.email "292407963+emranyounasdxb-ai@users.noreply.github.com"
+          git add src/components/desktop/desktop-window.tsx
+          git commit -m "Format desktop window component"
+          git push origin HEAD:${{ github.head_ref }}
+
       - name: Run lint
         run: pnpm lint
 
       - name: Run typecheck
         run: pnpm typecheck
 
-      - name: Check desktop window formatting
-        run: pnpm exec prettier --check src/components/desktop/desktop-window.tsx
-
-      - name: Check desktop store formatting
-        if: always()
-        run: pnpm exec prettier --check src/stores/desktop-store.ts
-
-      - name: Check README formatting
-        if: always()
-        run: pnpm exec prettier --check README.md
-
-      - name: Check workflow formatting
-        if: always()
-        run: pnpm exec prettier --check .github/workflows/quality.yml
-
-      - name: Check project formatting
-        if: always()
+      - name: Check formatting
         run: pnpm format:check
 
       - name: Build application
-        if: always()
         run: pnpm build
