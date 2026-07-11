@@ -36,3 +36,28 @@ export type DesktopWindowState = {
   size: DesktopRect;
   minimized: boolean;
 };
+
+export type DesktopCommandCategory =
+  "application" | "desktop-action" | "planned";
+
+export type DesktopCommandAction =
+  | { type: "open-app"; appId: DesktopAppId }
+  | { type: "minimize-active-window" }
+  | { type: "close-active-window" }
+  | { type: "close-all-windows" }
+  | { type: "restore-all-windows" }
+  | { type: "reset-desktop-layout" };
+
+export type DesktopCommandAvailability =
+  "always" | "has-active-window" | "has-open-windows" | "has-minimized-windows";
+
+export type DesktopCommand = {
+  id: string;
+  label: string;
+  description?: string;
+  icon: LucideIcon;
+  keywords: string[];
+  category: DesktopCommandCategory;
+  availability: DesktopCommandAvailability;
+  action: DesktopCommandAction;
+};
