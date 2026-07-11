@@ -6,9 +6,7 @@ EMRAN LABS is a futuristic personal technology portfolio that will grow into a p
 
 ## Step 1 foundation status
 
-The current foundation establishes a clean Next.js application with TypeScript, Tailwind CSS, reusable design tokens, site metadata, basic SEO routes, documentation, and a minimal foundation verification page.
-
-The complete desktop experience, floating windows, command palette, selective 3D experiences, advanced motion, and EM AI functionality are intentionally not implemented yet.
+Step 1 established a clean Next.js application with TypeScript, Tailwind CSS, reusable design tokens, site metadata, basic SEO routes, documentation, and a minimal foundation verification page.
 
 ## Step 2 desktop shell status
 
@@ -16,7 +14,9 @@ The current experience now includes the first functional EMRAN LABS desktop shel
 
 Window management supports opening, closing, minimizing, restoring, focusing, layering, and desktop pointer dragging with viewport boundary clamping. Enabled Step 2 applications include About Identity, Skills, Portfolio Projects, and Contact, while Creative Labs, Professional Journey, and EM AI remain visible as later-phase applications.
 
-Responsive behavior keeps windows movable on larger screens and presents applications as safer near-full-screen panels with a compact bottom dock on mobile. Keyboard-accessible controls, visible focus states, Escape-to-close behavior, and reduced-motion support are included in the shell foundation.
+Responsive behavior keeps windows movable on larger screens and presents one active application as a safer near-full-screen panel with a compact bottom dock on mobile and tablet layouts. Keyboard-accessible controls, visible focus states, Escape-to-close behavior, and reduced-motion support are included in the shell foundation.
+
+Advanced features such as the command palette, selective 3D experiences, cinematic motion, and EM AI functionality remain planned for later phases.
 
 ## Technology foundation
 
