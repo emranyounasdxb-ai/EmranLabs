@@ -1,9 +1,15 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
 import type { KeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  commandCenterMotionVariants,
+  motionTransitions,
+  overlayMotionVariants,
+} from "@/config/motion";
 import { desktopCommands } from "@/config/desktop-commands";
 import { useDesktopStore } from "@/stores/desktop-store";
 import type { DesktopCommand, DesktopCommandAction } from "@/types/desktop";
@@ -147,8 +153,6 @@ export function DesktopCommandCenter() {
     };
   }, [commandCenterOpen]);
 
-  if (!commandCenterOpen) return null;
-
   const safeActiveIndex = Math.min(
     activeIndex,
     Math.max(enabledFilteredCommands.length - 1, 0),
@@ -208,99 +212,113 @@ export function DesktopCommandCenter() {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[500] flex items-end justify-center bg-black/45 px-3 py-4 backdrop-blur-sm sm:items-center sm:p-6"
-      onPointerDown={closeCommandCenter}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="command-center-title"
-        className="max-h-[min(86dvh,44rem)] w-full max-w-2xl overflow-hidden rounded-[1.75rem] border border-[var(--glass-border)] bg-[rgba(11,12,16,0.92)] shadow-[var(--shadow-panel)] backdrop-blur-2xl"
-        onKeyDown={handleKeyDown}
-        onPointerDown={(event) => event.stopPropagation()}
-      >
-        <div className="border-b border-[var(--glass-border)] p-4 sm:p-5">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2
-                id="command-center-title"
-                className="font-heading text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]"
-              >
-                Command Center
-              </h2>
-              <p className="text-xs text-[var(--text-secondary)]">
-                Search applications and desktop actions.
-              </p>
-            </div>
-            <DesktopShortcutHint keys={["Esc"]} />
-          </div>
-          <label className="sr-only" htmlFor="desktop-command-search">
-            Search commands
-          </label>
-          <div className="flex min-h-12 items-center gap-3 rounded-2xl border border-[var(--glass-border)] bg-white/[0.055] px-4">
-            <Search
-              aria-hidden="true"
-              className="size-4 text-[var(--color-signal)]"
-            />
-            <input
-              ref={inputRef}
-              id="desktop-command-search"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setActiveIndex(0);
-              }}
-              placeholder="Search apps and actions"
-              className="min-w-0 flex-1 bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-secondary)]"
-              autoComplete="off"
-            />
-          </div>
-        </div>
-
-        <div
-          className="max-h-[52dvh] overflow-y-auto p-3 sm:p-4"
-          role="listbox"
-          aria-label="Command results"
+    <AnimatePresence>
+      {commandCenterOpen && (
+        <motion.div
+          variants={overlayMotionVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={motionTransitions.fast}
+          className="fixed inset-0 z-[500] flex items-end justify-center bg-black/45 px-3 py-4 backdrop-blur-sm sm:items-center sm:p-6"
+          onPointerDown={closeCommandCenter}
         >
-          {filteredCommands.length === 0 && (
-            <p className="rounded-2xl border border-[var(--glass-border)] bg-white/[0.035] px-4 py-6 text-center text-sm text-[var(--text-secondary)]">
-              No commands match your search.
-            </p>
-          )}
-
-          {Object.entries(groupedCommands).map(([category, commands]) => (
-            <section key={category} className="mb-4 last:mb-0">
-              <h3 className="px-3 pb-2 font-mono text-[0.68rem] tracking-[0.22em] text-[var(--text-secondary)] uppercase">
-                {categoryLabels[category as DesktopCommand["category"]]}
-              </h3>
-              <div className="space-y-1">
-                {commands.map((command) => {
-                  const commandIndex = enabledFilteredCommands.findIndex(
-                    (enabledCommand) => enabledCommand.id === command.id,
-                  );
-                  const disabled = !isCommandAvailable(command);
-                  return (
-                    <DesktopCommandItem
-                      key={command.id}
-                      command={command}
-                      active={commandIndex === safeActiveIndex && !disabled}
-                      disabled={disabled}
-                      onPointerMove={() => {
-                        if (commandIndex >= 0) setActiveIndex(commandIndex);
-                      }}
-                      onSelect={() => {
-                        if (!disabled) executeAction(command.action);
-                      }}
-                    />
-                  );
-                })}
+          <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="command-center-title"
+            variants={commandCenterMotionVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={motionTransitions.standard}
+            className="max-h-[min(86dvh,44rem)] w-full max-w-2xl overflow-hidden rounded-[1.75rem] border border-[var(--glass-border)] bg-[rgba(11,12,16,0.92)] shadow-[var(--shadow-panel)] backdrop-blur-2xl"
+            onKeyDown={handleKeyDown}
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            <div className="border-b border-[var(--glass-border)] p-4 sm:p-5">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <h2
+                    id="command-center-title"
+                    className="font-heading text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]"
+                  >
+                    Command Center
+                  </h2>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Search applications and desktop actions.
+                  </p>
+                </div>
+                <DesktopShortcutHint keys={["Esc"]} />
               </div>
-            </section>
-          ))}
-        </div>
-      </div>
-    </div>
+              <label className="sr-only" htmlFor="desktop-command-search">
+                Search commands
+              </label>
+              <div className="flex min-h-12 items-center gap-3 rounded-2xl border border-[var(--glass-border)] bg-white/[0.055] px-4">
+                <Search
+                  aria-hidden="true"
+                  className="size-4 text-[var(--color-signal)]"
+                />
+                <input
+                  ref={inputRef}
+                  id="desktop-command-search"
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setActiveIndex(0);
+                  }}
+                  placeholder="Search apps and actions"
+                  className="min-w-0 flex-1 bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-secondary)]"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+
+            <div
+              className="max-h-[52dvh] overflow-y-auto p-3 sm:p-4"
+              role="listbox"
+              aria-label="Command results"
+            >
+              {filteredCommands.length === 0 && (
+                <p className="rounded-2xl border border-[var(--glass-border)] bg-white/[0.035] px-4 py-6 text-center text-sm text-[var(--text-secondary)]">
+                  No commands match your search.
+                </p>
+              )}
+
+              {Object.entries(groupedCommands).map(([category, commands]) => (
+                <section key={category} className="mb-4 last:mb-0">
+                  <h3 className="px-3 pb-2 font-mono text-[0.68rem] tracking-[0.22em] text-[var(--text-secondary)] uppercase">
+                    {categoryLabels[category as DesktopCommand["category"]]}
+                  </h3>
+                  <div className="space-y-1">
+                    {commands.map((command) => {
+                      const commandIndex = enabledFilteredCommands.findIndex(
+                        (enabledCommand) => enabledCommand.id === command.id,
+                      );
+                      const disabled = !isCommandAvailable(command);
+                      return (
+                        <DesktopCommandItem
+                          key={command.id}
+                          command={command}
+                          active={commandIndex === safeActiveIndex && !disabled}
+                          disabled={disabled}
+                          onPointerMove={() => {
+                            if (commandIndex >= 0) setActiveIndex(commandIndex);
+                          }}
+                          onSelect={() => {
+                            if (!disabled) executeAction(command.action);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

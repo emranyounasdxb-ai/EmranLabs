@@ -1,9 +1,11 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Minus, X } from "lucide-react";
 import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { useCallback, useEffect, useRef } from "react";
 
+import { motionTransitions, windowMotionVariants } from "@/config/motion";
 import { cn } from "@/lib/utils";
 import type {
   DesktopApp,
@@ -116,8 +118,13 @@ export function DesktopWindow({
   };
 
   return (
-    <section
+    <motion.section
       role="dialog"
+      variants={windowMotionVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={motionTransitions.standard}
       aria-label={app.title}
       aria-modal="false"
       onPointerDown={onFocus}
@@ -177,6 +184,6 @@ export function DesktopWindow({
       <div className="min-h-0 flex-1 overflow-auto p-5 text-sm leading-6 text-[var(--text-secondary)] sm:p-6">
         {children}
       </div>
-    </section>
+    </motion.section>
   );
 }

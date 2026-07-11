@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 
 import { desktopApps } from "@/config/desktop-apps";
@@ -22,7 +23,11 @@ export function DesktopDock() {
       aria-label="Application dock"
       className="fixed right-2 bottom-3 left-2 z-[210] flex justify-center sm:bottom-5"
     >
-      <div className="flex max-w-full gap-2 overflow-x-auto rounded-[2rem] border border-[var(--glass-border)] bg-[rgba(11,12,16,0.76)] p-2 shadow-[var(--shadow-panel)] backdrop-blur-xl">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex max-w-full gap-2 overflow-x-auto rounded-[2rem] border border-[var(--glass-border)] bg-[rgba(11,12,16,0.76)] p-2 shadow-[var(--shadow-panel)] backdrop-blur-xl"
+      >
         <button
           type="button"
           onClick={() => setCommandCenterOpen(true)}
@@ -51,7 +56,7 @@ export function DesktopDock() {
             />
           );
         })}
-      </div>
+      </motion.div>
     </nav>
   );
 }

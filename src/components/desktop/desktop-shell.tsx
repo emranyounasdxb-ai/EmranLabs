@@ -1,5 +1,6 @@
 "use client";
 
+import { DesktopMotionProvider } from "@/components/motion/motion-provider";
 import { useDesktopShortcuts } from "@/hooks/use-desktop-shortcuts";
 
 import { DesktopBackground } from "./desktop-background";
@@ -12,12 +13,14 @@ export function DesktopShell() {
   useDesktopShortcuts();
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
-      <DesktopBackground />
-      <DesktopTopBar />
-      <DesktopWorkspace />
-      <DesktopDock />
-      <DesktopCommandCenter />
-    </div>
+    <DesktopMotionProvider>
+      <div className="relative min-h-screen overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
+        <DesktopBackground />
+        <DesktopTopBar />
+        <DesktopWorkspace />
+        <DesktopDock />
+        <DesktopCommandCenter />
+      </div>
+    </DesktopMotionProvider>
   );
 }

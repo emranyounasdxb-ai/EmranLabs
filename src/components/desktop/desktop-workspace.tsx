@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatePresence } from "framer-motion";
+
 import { AppContentRouter } from "@/components/portfolio-apps/app-content-router";
 import { desktopAppMap, desktopApps } from "@/config/desktop-apps";
 import { useDesktopStore } from "@/stores/desktop-store";
@@ -33,26 +35,28 @@ export function DesktopWorkspace() {
           />
         ))}
       </div>
-      {Object.values(windows).map((windowState) => {
-        const app = desktopAppMap.get(windowState.appId);
-        if (!app || windowState.minimized) return null;
-        return (
-          <DesktopWindow
-            key={windowState.appId}
-            app={app}
-            windowState={windowState}
-            active={activeWindowId === windowState.appId}
-            onFocus={() => focusWindow(windowState.appId)}
-            onMinimize={() => minimizeWindow(windowState.appId)}
-            onClose={() => closeWindow(windowState.appId)}
-            onMove={(position) =>
-              setWindowPosition(windowState.appId, position)
-            }
-          >
-            <AppContentRouter appId={windowState.appId} />
-          </DesktopWindow>
-        );
-      })}
+      <AnimatePresence>
+        {Object.values(windows).map((windowState) => {
+          const app = desktopAppMap.get(windowState.appId);
+          if (!app || windowState.minimized) return null;
+          return (
+            <DesktopWindow
+              key={windowState.appId}
+              app={app}
+              windowState={windowState}
+              active={activeWindowId === windowState.appId}
+              onFocus={() => focusWindow(windowState.appId)}
+              onMinimize={() => minimizeWindow(windowState.appId)}
+              onClose={() => closeWindow(windowState.appId)}
+              onMove={(position) =>
+                setWindowPosition(windowState.appId, position)
+              }
+            >
+              <AppContentRouter appId={windowState.appId} />
+            </DesktopWindow>
+          );
+        })}
+      </AnimatePresence>
     </main>
   );
 }
