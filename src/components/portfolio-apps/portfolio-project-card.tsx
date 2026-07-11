@@ -32,7 +32,10 @@ export function PortfolioProjectCard({
       <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
         {project.summary}
       </p>
-      <ul className="mt-4 flex flex-wrap gap-2" aria-label={`${project.name} platforms`}>
+      <ul
+        className="mt-4 flex flex-wrap gap-2"
+        aria-label={`${project.name} platforms`}
+      >
         {project.platforms.map((platform) => (
           <li
             key={platform}
