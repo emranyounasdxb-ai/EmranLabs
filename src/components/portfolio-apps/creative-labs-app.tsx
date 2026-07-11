@@ -30,10 +30,7 @@ export function CreativeLabsApp() {
           onBack={() => {
             const labId = selectedLab.id;
             setSelectedLabId(null);
-            window.setTimeout(
-              () => triggerRefs.current.get(labId)?.focus(),
-              0,
-            );
+            window.setTimeout(() => triggerRefs.current.get(labId)?.focus(), 0);
           }}
         />
       </div>
