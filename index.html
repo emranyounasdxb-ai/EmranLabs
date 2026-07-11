@@ -1,50 +1,616 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Emran Labs Deployment Test</title>
-  <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, #0f2b5b 0%, #06111f 50%, #02060d 100%);
-      color: #fff;
-    }
-    main {
-      width: min(92%, 760px);
-      padding: 48px;
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 24px;
-      background: rgba(255,255,255,.07);
-      box-shadow: 0 24px 80px rgba(0,0,0,.45);
-      text-align: center;
-      backdrop-filter: blur(16px);
-    }
-    h1 { margin: 0 0 14px; font-size: clamp(34px, 7vw, 64px); }
-    p { margin: 8px 0; color: #c9daf5; font-size: 18px; line-height: 1.6; }
-    .status {
-      display: inline-block;
-      margin-top: 24px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      background: #19c37d;
-      color: #02130d;
-      font-weight: 700;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Windows 2030 — Interactive</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#05060C;
+  --panel:rgba(18,20,36,0.55);
+  --panel-strong:rgba(24,27,48,0.75);
+  --border:rgba(255,255,255,0.10);
+  --text-primary:#F3F4FA;
+  --text-muted:#9BA0BE;
+  --cyan:#39D0FF;
+  --violet:#8B6BFF;
+  --pink:#FF6BD6;
+  --green:#3FE0A5;
+  --amber:#FFB84D;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:'Inter',sans-serif;color:var(--text-primary);}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
+
+.stage{position:relative;width:100vw;height:100vh;background:var(--bg);overflow:hidden;}
+.sky{position:absolute;inset:0;
+  background:
+    radial-gradient(900px 500px at 50% 8%, rgba(139,107,255,0.28), transparent 60%),
+    radial-gradient(700px 500px at 12% 70%, rgba(57,208,255,0.14), transparent 60%),
+    radial-gradient(700px 500px at 88% 60%, rgba(255,107,214,0.10), transparent 60%),
+    linear-gradient(180deg,#05060C 0%, #090B18 55%, #0B0E1C 100%);
+}
+.stars{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.6), transparent),radial-gradient(1.5px 1.5px at 70% 15%, rgba(255,255,255,0.5), transparent),radial-gradient(1px 1px at 45% 60%, rgba(255,255,255,0.4), transparent),radial-gradient(1.5px 1.5px at 85% 45%, rgba(255,255,255,0.5), transparent);opacity:0.8;}
+.moon{position:absolute;top:8%;right:16%;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 35%, #cfd6ea, #7d84a3);box-shadow:0 0 40px rgba(180,190,255,0.2);}
+.ridge{position:absolute;left:0;right:0;bottom:0;height:30%;clip-path:polygon(0 100%,0 55%,8% 48%,16% 60%,26% 40%,34% 58%,44% 30%,52% 52%,60% 20%,68% 46%,78% 34%,86% 55%,94% 42%,100% 58%,100% 100%);background:#05060C;}
+.particles{position:absolute;inset:0;z-index:2;pointer-events:none;}
+.cursor-glow{position:absolute;top:0;left:0;width:640px;height:640px;margin-left:-320px;margin-top:-320px;z-index:1;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%, rgba(139,107,255,0.32) 0%, rgba(57,208,255,0.20) 28%, rgba(255,107,214,0.14) 50%, transparent 72%);
+  filter:blur(30px); opacity:0; transition:opacity .4s ease;}
+.cursor-glow.on{opacity:1;}
+
+/* top bar */
+.topbar{position:absolute;top:20px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 26px;z-index:5;}
+.brand{display:flex;align-items:center;gap:11px;}
+.brand .mark{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:flex;align-items:center;justify-content:center;}
+.brand .mark svg{width:18px;height:18px;fill:#fff;}
+.brand h1{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin:0;}
+.brand p{font-size:10.5px;color:var(--text-muted);margin:1px 0 0;}
+
+.status-pill{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:9px 16px;backdrop-filter:blur(18px);font-size:12px;}
+.status-pill .sep{width:1px;height:13px;background:var(--border);}
+.status-pill .mic{width:24px;height:24px;border-radius:50%;background:var(--panel-strong);display:flex;align-items:center;justify-content:center;transition:.15s;}
+.status-pill .mic:hover{background:var(--cyan);}
+.status-pill .mic svg{width:11px;height:11px;stroke:var(--text-primary);fill:none;stroke-width:1.8;}
+.status-pill .mic.listening{background:var(--pink);}
+
+.right-top{display:flex;align-items:center;gap:9px;}
+.ai-chip{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:6px 13px 6px 6px;backdrop-filter:blur(18px);}
+.ai-chip .orb{width:24px;height:24px;border-radius:50%;background:conic-gradient(from 90deg, var(--cyan), var(--violet), var(--pink), var(--cyan));}
+.ai-chip b{font-size:11.5px;display:block;}
+.ai-chip span{font-size:9.5px;color:var(--text-muted);}
+.circle-btn{width:34px;height:34px;border-radius:50%;background:var(--panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(18px);transition:.15s;}
+.circle-btn:hover{background:var(--panel-strong);border-color:var(--cyan);}
+.circle-btn svg{width:13px;height:13px;stroke:var(--text-primary);fill:none;stroke-width:1.8;}
+
+/* left sidebar */
+.sidebar{position:absolute;top:96px;left:22px;bottom:78px;width:58px;background:var(--panel);border:1px solid var(--border);border-radius:24px;backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;padding:16px 0;z-index:5;}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));margin-bottom:20px;cursor:pointer;}
+.navitem{width:36px;height:36px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;color:var(--text-muted);transition:.15s;cursor:pointer;}
+.navitem svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;}
+.navitem.active{background:var(--panel-strong);color:var(--cyan);box-shadow:0 0 0 1px var(--border);}
+.navitem:hover{color:var(--text-primary);}
+
+/* home content */
+.home-content{position:absolute;top:96px;left:96px;right:24px;bottom:150px;z-index:3;display:flex;gap:14px;}
+.home-left{flex:1;display:flex;flex-direction:column;gap:14px;max-width:400px;}
+
+.greet{background:var(--panel);border:1px solid var(--border);border-radius:22px;backdrop-filter:blur(20px);padding:20px;position:relative;}
+.greet .hi{font-size:12px;color:var(--text-muted);margin:0 0 2px;}
+.greet h2{font-family:'Sora',sans-serif;font-size:22px;margin:0 0 10px;font-weight:700;}
+.cube-wrap{position:absolute;top:8px;right:14px;width:72px;height:72px;perspective:600px;}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:spin 9s linear infinite;}
+.cube .f{position:absolute;width:50px;height:50px;top:11px;left:11px;background:rgba(57,208,255,0.14);border:1px solid rgba(57,208,255,0.5);}
+.f1{transform:translateZ(25px);} .f2{transform:rotateY(90deg) translateZ(25px);} .f3{transform:rotateY(180deg) translateZ(25px);} .f4{transform:rotateY(-90deg) translateZ(25px);} .f5{transform:rotateX(90deg) translateZ(25px);} .f6{transform:rotateX(-90deg) translateZ(25px);}
+@keyframes spin{from{transform:rotateX(0) rotateY(0);}to{transform:rotateX(360deg) rotateY(360deg);}}
+.greet p{font-size:12px;color:var(--text-muted);line-height:1.55;margin:0 0 14px;max-width:220px;}
+.focus-row{display:flex;align-items:center;justify-content:space-between;background:var(--panel-strong);border-radius:14px;padding:10px 14px;cursor:pointer;transition:.15s;}
+.focus-row:hover{background:rgba(57,208,255,0.12);}
+.focus-row span{font-size:12px;}
+.focus-toggle{display:flex;align-items:center;gap:8px;}
+.focus-toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.focus-toggle small{color:var(--text-muted);font-size:11px;}
+
+.today{background:var(--panel);border:1px solid var(--border);border-radius:22px;backdrop-filter:blur(20px);padding:16px 18px;flex:1;overflow:auto;}
+.today h3{font-size:12.5px;margin:0 0 10px;font-weight:600;}
+.tItem{display:flex;gap:12px;padding:8px 4px;border-bottom:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.15s;}
+.tItem:hover{background:var(--panel-strong);}
+.tItem:last-child{border-bottom:1px solid var(--border);}
+.tItem .bar{width:3px;border-radius:3px;}
+.tItem .time{font-size:10.5px;color:var(--text-muted);width:60px;flex:none;}
+.tItem b{font-size:12px;display:block;}
+.tItem small{color:var(--text-muted);font-size:10.5px;}
+
+.home-right{width:270px;display:flex;flex-direction:column;gap:14px;overflow:auto;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(20px);padding:16px 18px;}
+.card h4{font-size:12px;margin:0 0 12px;font-weight:600;}
+.appgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.appitem{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:.12s;}
+.appitem:active{transform:scale(0.92);}
+.appitem .tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.appitem .tile svg{width:15px;height:15px;}
+.appitem span{font-size:8.5px;color:var(--text-muted);text-align:center;line-height:1.2;}
+
+.health-row{display:flex;align-items:center;gap:14px;}
+.ring{width:82px;height:82px;border-radius:50%;background:conic-gradient(var(--cyan) 0deg 353deg, var(--border) 353deg 360deg);display:flex;align-items:center;justify-content:center;flex:none;}
+.ring .inner{width:62px;height:62px;border-radius:50%;background:#0B0D1A;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring .inner b{font-family:'Sora',sans-serif;font-size:16px;}
+.ring .inner small{font-size:8px;color:var(--text-muted);}
+.metrics{flex:1;display:flex;flex-direction:column;gap:7px;}
+.metric{display:flex;justify-content:space-between;font-size:10.5px;}
+.metric span:first-child{color:var(--text-muted);}
+
+.holo{padding:0;overflow:hidden;}
+.holo-head{padding:14px 16px 8px;display:flex;justify-content:space-between;align-items:center;}
+.holo-thumb{position:relative;height:88px;margin:0 16px 12px;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 70% 40%, #2b3350, #0a0c18 70%);}
+.holo-thumb .planet{position:absolute;right:12px;bottom:-12px;width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #6d7bd6, #232544);}
+.holo-controls{display:flex;align-items:center;gap:10px;padding:0 16px 14px;}
+.holo-controls .play{width:28px;height:28px;border-radius:50%;background:var(--cyan);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;transition:.15s;}
+.holo-controls .play:hover{filter:brightness(1.15);}
+.holo-controls .play svg{width:11px;height:11px;fill:#05060C;}
+.holo-progress{flex:1;height:3px;border-radius:3px;background:var(--border);position:relative;cursor:pointer;}
+.holo-progress i{position:absolute;left:0;top:0;bottom:0;width:38%;background:var(--cyan);border-radius:3px;}
+
+/* floating app windows */
+.app-window{position:absolute;width:440px;background:rgba(14,15,26,0.85);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(26px);box-shadow:0 30px 60px rgba(0,0,0,0.5);overflow:hidden;z-index:50;display:flex;flex-direction:column;}
+.win-head{display:flex;align-items:center;justify-content:space-between;padding:11px 8px 11px 15px;border-bottom:1px solid var(--border);cursor:move;}
+.win-head .win-title{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:500;}
+.win-head .win-title .tile-sm{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.win-head .win-title .tile-sm svg{width:11px;height:11px;}
+.win-controls{display:flex;gap:4px;}
+.win-controls button{width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);}
+.win-controls button:hover{background:var(--panel-strong);}
+.win-controls .close:hover{background:var(--pink);color:#05060C;}
+.win-body{padding:20px;font-size:12.5px;color:var(--text-muted);line-height:1.6;max-height:360px;overflow:auto;}
+.win-body h1{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--text-primary);margin:0 0 8px;}
+.row{display:flex;align-items:center;justify-content:space-between;padding:11px 2px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text-primary);}
+.row:last-child{border-bottom:none;}
+.row small{display:block;color:var(--text-muted);font-size:11px;margin-top:2px;}
+.sw{width:34px;height:20px;border-radius:20px;background:var(--border);position:relative;flex:none;cursor:pointer;}
+.sw.on{background:linear-gradient(90deg,var(--cyan),var(--violet));}
+.sw i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .18s;}
+.sw.on i{left:16px;}
+
+/* dock */
+.dock{position:absolute;bottom:76px;left:50%;transform:translateX(-50%);display:flex;gap:5px;background:var(--panel);border:1px solid var(--border);border-radius:22px;backdrop-filter:blur(22px);padding:9px 12px;z-index:20;}
+.dockitem{display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 11px;border-radius:14px;cursor:pointer;transition:.15s;position:relative;}
+.dockitem:hover{background:var(--panel-strong);}
+.dockitem.active{background:var(--panel-strong);box-shadow:0 0 0 1px var(--border);}
+.dockitem .dtile{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.dockitem .dtile svg{width:14px;height:14px;}
+.dockitem span{font-size:9px;color:var(--text-muted);}
+.dockitem.running::after{content:"";position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--cyan);}
+
+/* status bar */
+.statusbar{position:absolute;bottom:0;left:0;right:0;height:42px;background:rgba(6,7,14,0.75);border-top:1px solid var(--border);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:11px;color:var(--text-muted);z-index:15;}
+.statusbar .grp{display:flex;align-items:center;gap:14px;}
+.wave{display:flex;align-items:center;gap:2px;height:14px;}
+.wave i{width:2.5px;background:var(--cyan);border-radius:2px;animation:wv 1.1s ease-in-out infinite;}
+@keyframes wv{0%,100%{height:4px;}50%{height:13px;}}
+.statusbar button{color:var(--text-muted);}
+.statusbar button:hover{color:var(--text-primary);}
+
+/* search overlay */
+.search-overlay{position:absolute;top:96px;left:50%;transform:translateX(-50%) translateY(-8px);width:420px;background:rgba(14,15,26,0.9);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(24px);padding:16px;z-index:60;opacity:0;pointer-events:none;transition:.15s;}
+.search-overlay.open{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+.search-overlay input{width:100%;background:var(--panel-strong);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;}
+.search-overlay .hint{font-size:11px;color:var(--text-muted);margin-top:10px;}
+</style>
 </head>
 <body>
-  <main>
-    <h1>Emran Labs</h1>
-    <p>GitHub to cPanel deployment test page.</p>
-    <p>Domain, Cloudflare, SSL and repository deployment are working.</p>
-    <div class="status">Deployment Test Successful</div>
-  </main>
+<div class="stage" id="stage">
+  <div class="sky"></div>
+  <div class="stars"></div>
+  <div class="moon"></div>
+  <div class="ridge"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
+  <canvas id="particles" class="particles"></canvas>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></div>
+      <div><h1>Windows 2030</h1><p>The next evolution of Windows</p></div>
+    </div>
+    <div class="status-pill">
+      <span id="fullDate">Saturday, June 15</span>
+      <div class="sep"></div>
+      <span id="clockTop">07:30 AM</span>
+      <div class="sep"></div>
+      <span>⛅ 24°C</span>
+      <div class="mic" id="micBtn"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></div>
+    </div>
+    <div class="right-top">
+      <div class="ai-chip" id="aiChip"><div class="orb"></div><div><b>Neuro</b><span>AI companion</span></div></div>
+      <div class="circle-btn" id="searchBtn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+      <div class="circle-btn" id="settingsTop"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div>
+    </div>
+  </div>
+
+  <div class="search-overlay" id="searchOverlay">
+    <input type="text" placeholder="Search apps, files, and settings">
+    <div class="hint">Try "files", "settings", or "Neuro"</div>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="avatar"></div>
+  </div>
+
+  <div class="home-content">
+    <div class="home-left">
+      <div class="greet">
+        <div class="cube-wrap"><div class="cube"><div class="f f1"></div><div class="f f2"></div><div class="f f3"></div><div class="f f4"></div><div class="f f5"></div><div class="f f6"></div></div></div>
+        <p class="hi">Good morning,</p>
+        <h2>Zaid</h2>
+        <p>Your day looks steady — 3 meetings, 2 deadlines, and a clear stretch for deep work this afternoon.</p>
+        <div class="focus-row" id="focusRow">
+          <span>Focus mode</span>
+          <div class="focus-toggle"><div class="dot" id="focusDot"></div><small id="focusLabel">On</small></div>
+        </div>
+      </div>
+      <div class="today">
+        <h3>Today</h3>
+        <div class="tItem" data-app="tasks"><div class="bar" style="background:var(--cyan)"></div><div class="time">09:00 AM</div><div><b>Project sync</b><small>Team meeting</small></div></div>
+        <div class="tItem" data-app="tasks"><div class="bar" style="background:var(--violet)"></div><div class="time">11:30 AM</div><div><b>Design review</b><small>Conference room 7</small></div></div>
+        <div class="tItem" data-app="tasks"><div class="bar" style="background:var(--pink)"></div><div class="time">02:00 PM</div><div><b>Client presentation</b><small>Online meeting</small></div></div>
+      </div>
+    </div>
+
+    <div class="home-right">
+      <div class="card">
+        <h4>Live workspace</h4>
+        <div class="appgrid" id="appgrid"></div>
+      </div>
+      <div class="card">
+        <h4>System health</h4>
+        <div class="health-row">
+          <div class="ring"><div class="inner"><b>98%</b><small>Optimal</small></div></div>
+          <div class="metrics">
+            <div class="metric"><span>CPU</span><span>16%</span></div>
+            <div class="metric"><span>Memory</span><span>28%</span></div>
+            <div class="metric"><span>GPU</span><span>34%</span></div>
+            <div class="metric"><span>Battery</span><span>87%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card holo">
+        <div class="holo-head"><h4 style="margin:0">Holo cast</h4><span style="font-size:9.5px;color:var(--text-muted)">Exoplanet doc</span></div>
+        <div class="holo-thumb"><div class="planet"></div></div>
+        <div class="holo-controls">
+          <div class="play" id="playBtn"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="holo-progress" id="holoProgress"><i id="holoFill"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dock" id="dock"></div>
+
+  <div class="statusbar">
+    <div class="grp"><span>⛅ 24°C Partly cloudy</span></div>
+    <div class="grp">
+      <span>Active task: Project Aurora</span>
+      <div class="wave"><i style="height:6px"></i><i style="height:12px"></i><i style="height:8px"></i><i style="height:13px"></i><i style="height:7px"></i><i style="height:11px"></i></div>
+    </div>
+    <div class="grp"><span id="clockBottom">07:30 AM</span></div>
+  </div>
+</div>
+
+<script>
+const ICONS = {
+  files:{name:'Files',color:'var(--amber)',glyph:'<path d="M3 8a2 2 0 012-2h4l1.6 2H19a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" fill="#05060C"/>'},
+  edge:{name:'Edge',color:'var(--green)',glyph:'<circle cx="12" cy="12" r="8" fill="none" stroke="#05060C" stroke-width="1.8"/><path d="M4 12h16M12 4c2.3 2.3 2.3 13.7 0 16" fill="none" stroke="#05060C" stroke-width="1.6"/>'},
+  store:{name:'Store',color:'var(--pink)',glyph:'<path d="M6 8l1-4h10l1 4" stroke="#05060C" stroke-width="1.7" fill="none"/><rect x="5" y="8" width="14" height="12" rx="2" fill="#05060C"/>'},
+  settings:{name:'Settings',color:'var(--panel-strong)',glyph:'<circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="1.7" fill="none"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9M4.6 9a1.7 1.7 0 00-.3-1.9M12 3v3M12 18v3M3 12h3M18 12h3" stroke="#fff" stroke-width="1.5"/>'},
+  tasks:{name:'Tasks',color:'var(--panel-strong)',glyph:'<rect x="4" y="4" width="16" height="16" rx="3" stroke="#fff" stroke-width="1.7" fill="none"/><path d="M8 12l2.5 2.5L16 9" stroke="#fff" stroke-width="1.7" fill="none"/>'},
+  neuro:{name:'Neuro',color:'conic-gradient(from 90deg, var(--cyan), var(--violet), var(--pink))',glyph:''},
+  figma:{name:'Figma',color:'#FF5C5C',glyph:'<circle cx="12" cy="7" r="3" fill="#fff"/><circle cx="9" cy="12" r="3" fill="#fff"/><circle cx="12" cy="17" r="3" fill="#fff"/>'},
+  code:{name:'Code',color:'var(--cyan)',glyph:'<path d="M8 8L4 12l4 4M16 8l4 4-4 4" stroke="#05060C" stroke-width="2" fill="none"/>'},
+  reports:{name:'Reports',color:'var(--amber)',glyph:'<path d="M6 18V10M12 18V6M18 18v-4" stroke="#05060C" stroke-width="2" fill="none"/>'},
+  engine:{name:'Engine',color:'var(--violet)',glyph:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" fill="#fff" opacity=".9"/>'}
+};
+
+const CONTENT = {
+  files:`<h1>Files</h1><div class="row"><div>Documents</div></div><div class="row"><div>Project notes.txt</div></div><div class="row"><div>Screenshots</div></div><div class="row"><div>Archive.zip</div></div>`,
+  edge:`<h1>Edge</h1><p>A new tab, uncluttered. Neuro can summarize a page, compare tabs, or pull the one fact you're after — right from the address bar.</p><div class="row"><div>Block trackers<small>On by default in every window</small></div><div class="sw on"><i></i></div></div>`,
+  store:`<h1>Store</h1><p>Apps, verified and sandboxed by default.</p><div class="row"><div>Auto-update apps<small>Keep everything current overnight</small></div><div class="sw on"><i></i></div></div>`,
+  settings:`<h1>System settings</h1><div class="row"><div>Neuro suggestions<small>Contextual tips across the desktop</small></div><div class="sw on"><i></i></div></div><div class="row"><div>Adaptive color<small>Accent shifts with your wallpaper</small></div><div class="sw on"><i></i></div></div><div class="row"><div>Focus sessions<small>Mute notifications on a schedule</small></div><div class="sw"><i></i></div></div>`,
+  tasks:`<h1>Tasks</h1><div class="row"><div>Project sync<small>09:00 AM · Team meeting</small></div></div><div class="row"><div>Design review<small>11:30 AM · Conference room 7</small></div></div><div class="row"><div>Client presentation<small>02:00 PM · Online meeting</small></div></div>`,
+  neuro:`<h1>Neuro</h1><p>Your AI companion, present across every app. Ask it to summarize, draft, schedule, or explain — it keeps context between them.</p><div class="row"><div>Voice activation<small>Say "Neuro" to start listening</small></div><div class="sw on"><i></i></div></div>`,
+  figma:`<h1>Figma</h1><p>Design file — last edited 12 minutes ago by the team.</p>`,
+  code:`<h1>Code</h1><p>Workspace synced. 3 branches ahead, 0 conflicts.</p>`,
+  reports:`<h1>Reports</h1><p>Data report refreshed 4 minutes ago. Revenue up 6% week over week.</p>`,
+  engine:`<h1>Engine</h1><p>3D project — render queue: 2 jobs remaining.</p>`
+};
+
+const stage = document.getElementById('stage');
+let z = 100;
+const open = {};
+let cascade = 0;
+
+function tileSvg(id, size, forGrid){
+  const a = ICONS[id];
+  const r = Math.round(size*0.29);
+  return `<div class="tile" style="background:${a.color};width:${size}px;height:${size}px;border-radius:${r}px"><svg viewBox="0 0 24 24">${a.glyph}</svg></div>`;
+}
+
+function makeDraggable(win, head){
+  head.addEventListener('mousedown', e=>{
+    if(e.target.closest('.win-controls')) return;
+    const startX=e.clientX, startY=e.clientY;
+    const rect=win.getBoundingClientRect();
+    const startLeft=rect.left, startTop=rect.top;
+    win.style.zIndex = ++z;
+    function move(ev){
+      win.style.left = (startLeft+ev.clientX-startX)+'px';
+      win.style.top = (startTop+ev.clientY-startY)+'px';
+    }
+    function up(){ document.removeEventListener('mousemove',move); document.removeEventListener('mouseup',up); }
+    document.addEventListener('mousemove',move);
+    document.addEventListener('mouseup',up);
+  });
+}
+
+function toggleApp(id){
+  if(open[id]){
+    if(open[id].minimized){ restoreApp(id); } else { minimizeApp(id); }
+  } else { createApp(id); }
+}
+
+function createApp(id){
+  const win = document.createElement('div');
+  win.className='app-window';
+  const offset = 26*(cascade%6); cascade++;
+  win.style.left = (Math.min(window.innerWidth-480,420)+offset)+'px';
+  win.style.top = (100+offset)+'px';
+  win.style.zIndex = ++z;
+  const a = ICONS[id];
+  win.innerHTML = `
+    <div class="win-head">
+      <div class="win-title"><div class="tile-sm" style="background:${a.color}"><svg viewBox="0 0 24 24">${a.glyph}</svg></div>${a.name}</div>
+      <div class="win-controls">
+        <button class="min" aria-label="Minimize"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button>
+        <button class="close" aria-label="Close"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+    </div>
+    <div class="win-body">${CONTENT[id]}</div>`;
+  stage.appendChild(win);
+  const head = win.querySelector('.win-head');
+  makeDraggable(win, head);
+  win.addEventListener('mousedown', ()=>focusApp(id));
+  win.querySelector('.min').addEventListener('click', e=>{e.stopPropagation(); minimizeApp(id);});
+  win.querySelector('.close').addEventListener('click', e=>{e.stopPropagation(); closeApp(id);});
+  win.querySelectorAll('.sw').forEach(sw=>sw.addEventListener('click', ()=>sw.classList.toggle('on')));
+  open[id] = {el:win, minimized:false};
+  updateDockState(id);
+  focusApp(id);
+}
+
+function focusApp(id){
+  if(!open[id]) return;
+  open[id].el.style.zIndex = ++z;
+}
+function minimizeApp(id){
+  if(!open[id]) return;
+  open[id].el.style.display='none';
+  open[id].minimized=true;
+}
+function restoreApp(id){
+  if(!open[id]) return;
+  open[id].el.style.display='flex';
+  open[id].minimized=false;
+  focusApp(id);
+}
+function closeApp(id){
+  if(!open[id]) return;
+  open[id].el.remove();
+  delete open[id];
+  updateDockState(id);
+}
+function updateDockState(id){
+  const btn = dockBtns[id];
+  if(btn) btn.classList.toggle('running', !!open[id]);
+}
+
+/* nav sidebar (visual only, cosmetic active state) */
+const NAV = [
+  {name:'Home', d:'M3 11l9-7 9 7M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9'},
+  {name:'Work', d:'M3 8a2 2 0 012-2h4l1-2h4l1 2h4a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z'},
+  {name:'Create', d:'M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z'},
+  {name:'Connect', d:'M8 11a4 4 0 118 0M4 20c0-3.3 3.6-5 8-5s8 1.7 8 5'},
+  {name:'Explore', d:'M12 3a9 9 0 100 18 9 9 0 000-18zM8.5 15.5L11 11l4.5-2.5L13 13l-4.5 2.5z'}
+];
+const sidebar = document.getElementById('sidebar');
+NAV.forEach((n,i)=>{
+  const el = document.createElement('div');
+  el.className = 'navitem'+(i===0?' active':'');
+  el.innerHTML = `<svg viewBox="0 0 24 24"><path d="${n.d}"/></svg>`;
+  el.title = n.name;
+  el.addEventListener('click', ()=>{
+    sidebar.querySelectorAll('.navitem').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+  });
+  sidebar.appendChild(el);
+});
+
+/* live workspace grid -> opens apps */
+const APPGRID = ['figma','code','reports','engine'];
+const appgrid = document.getElementById('appgrid');
+APPGRID.forEach(id=>{
+  const el = document.createElement('div');
+  el.className='appitem';
+  const a = ICONS[id];
+  el.innerHTML = `<div class="tile" style="background:${a.color}"><svg viewBox="0 0 24 24">${a.glyph}</svg></div><span>${a.name}</span>`;
+  el.addEventListener('click', ()=>toggleApp(id));
+  appgrid.appendChild(el);
+});
+
+/* dock */
+const DOCK = ['files','edge','store','settings','tasks','neuro'];
+const dock = document.getElementById('dock');
+const dockBtns = {};
+DOCK.forEach(id=>{
+  const a = ICONS[id];
+  const el = document.createElement('div');
+  el.className='dockitem';
+  el.innerHTML = `<div class="dtile" style="background:${a.color}"><svg viewBox="0 0 24 24">${a.glyph}</svg></div><span>${a.name}</span>`;
+  el.addEventListener('click', ()=>{
+    dock.querySelectorAll('.dockitem').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    toggleApp(id);
+  });
+  dockBtns[id]=el;
+  dock.appendChild(el);
+});
+
+/* today items open tasks */
+document.querySelectorAll('.tItem').forEach(item=>{
+  item.addEventListener('click', ()=>toggleApp('tasks'));
+});
+
+/* focus toggle */
+let focusOn = true;
+document.getElementById('focusRow').addEventListener('click', ()=>{
+  focusOn = !focusOn;
+  document.getElementById('focusDot').style.background = focusOn ? 'var(--green)' : 'var(--text-muted)';
+  document.getElementById('focusLabel').textContent = focusOn ? 'On' : 'Off';
+});
+
+/* holo play */
+let playing = true, holoPct = 38;
+document.getElementById('playBtn').addEventListener('click', ()=>{
+  playing = !playing;
+  document.getElementById('playIcon').innerHTML = playing
+    ? '<path d="M8 5v14l11-7z"/>'
+    : '<rect x="7" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+});
+document.getElementById('holoProgress').addEventListener('click', e=>{
+  const rect = e.currentTarget.getBoundingClientRect();
+  holoPct = Math.round(((e.clientX-rect.left)/rect.width)*100);
+  document.getElementById('holoFill').style.width = holoPct+'%';
+});
+
+/* mic + ai chip + search + settings top */
+const micBtn = document.getElementById('micBtn');
+micBtn.addEventListener('click', ()=>micBtn.classList.toggle('listening'));
+document.getElementById('aiChip').addEventListener('click', ()=>toggleApp('neuro'));
+document.getElementById('settingsTop').addEventListener('click', ()=>toggleApp('settings'));
+
+const searchBtn = document.getElementById('searchBtn');
+const searchOverlay = document.getElementById('searchOverlay');
+searchBtn.addEventListener('click', e=>{ e.stopPropagation(); searchOverlay.classList.toggle('open'); if(searchOverlay.classList.contains('open')) searchOverlay.querySelector('input').focus(); });
+document.addEventListener('click', ()=> searchOverlay.classList.remove('open'));
+searchOverlay.addEventListener('click', e=>e.stopPropagation());
+
+function tick(){
+  const d = new Date();
+  const h = d.getHours()%12 || 12;
+  const m = d.getMinutes().toString().padStart(2,'0');
+  const ap = d.getHours()>=12 ? 'PM':'AM';
+  const str = h+':'+m+' '+ap;
+  document.getElementById('clockTop').textContent = str;
+  document.getElementById('clockBottom').textContent = str;
+}
+tick(); setInterval(tick, 15000);
+
+/* mouse-following glow — inspired by nova.app's hero spotlight */
+(function(){
+  const glow = document.getElementById('cursorGlow');
+  let gx=window.innerWidth/2, gy=window.innerHeight/2;
+  let tx=gx, ty=gy;
+  let shown = false;
+
+  window.addEventListener('mousemove', e=>{
+    tx = e.clientX; ty = e.clientY;
+    if(!shown){ gx=tx; gy=ty; shown=true; glow.classList.add('on'); }
+  });
+  window.addEventListener('mouseleave', ()=> glow.classList.remove('on'));
+
+  function loop(){
+    gx += (tx-gx)*0.09;
+    gy += (ty-gy)*0.09;
+    glow.style.transform = `translate(${gx}px, ${gy}px)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* 3D dust field — depth-parallax particles that drift and react to the cursor */
+(function(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr, cx, cy;
+  const mouse = {x:0, y:0};
+  let camX=0, camY=0, targetCamX=0, targetCamY=0;
+  let particles = [];
+  let t = 0;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio||1, 2);
+    W = canvas.clientWidth = window.innerWidth;
+    H = canvas.clientHeight = window.innerHeight;
+    cx = W/2; cy = H/2;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    mouse.x = cx; mouse.y = cy;
+  }
+
+  function makeParticles(){
+    const count = Math.min(750, Math.round((W*H)/2600));
+    particles = [];
+    for(let i=0;i<count;i++){
+      const z = Math.random();
+      particles.push({
+        wx: (Math.random()*1.5-0.25)*W,
+        wy: (Math.random()*1.5-0.25)*H,
+        z: z,
+        vx: (Math.random()-0.5)*0.06,
+        vy: (Math.random()-0.5)*0.06,
+        drift: Math.random()*Math.PI*2,
+        tw: Math.random()*0.6+0.4,
+        tint: Math.random()
+      });
+    }
+  }
+
+  function colorFor(p, z){
+    if(p.tint < 0.15) return `173,225,255`;
+    if(p.tint < 0.3) return `210,190,255`;
+    if(p.tint < 0.4) return `255,200,235`;
+    return `230,235,250`;
+  }
+
+  function step(){
+    ctx.fillStyle = 'rgba(5,6,12,0.35)';
+    ctx.fillRect(0,0,W,H);
+
+    targetCamX = (mouse.x - cx) * 0.6;
+    targetCamY = (mouse.y - cy) * 0.6;
+    camX += (targetCamX - camX) * 0.045;
+    camY += (targetCamY - camY) * 0.045;
+
+    t += 0.006;
+
+    for(const p of particles){
+      p.wx += p.vx + Math.sin(t + p.drift) * 0.02;
+      p.wy += p.vy + Math.cos(t + p.drift) * 0.02;
+
+      if(p.wx < -0.3*W) p.wx = 1.2*W;
+      if(p.wx > 1.2*W) p.wx = -0.3*W;
+      if(p.wy < -0.3*H) p.wy = 1.2*H;
+      if(p.wy > 1.2*H) p.wy = -0.3*H;
+
+      const depth = 0.15 + p.z*0.85;
+      const parallax = depth*depth;
+      const sx = p.wx - camX*parallax;
+      const sy = p.wy - camY*parallax;
+
+      const twinkle = 0.55 + Math.sin(t*p.tw*3 + p.drift*4) * 0.35;
+      const r = 0.35 + depth*2.1;
+      const alpha = (0.1 + depth*0.55) * twinkle;
+      const c = colorFor(p, depth);
+
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${c},${alpha})`;
+      if(depth > 0.55){
+        ctx.shadowColor = `rgba(${c},${alpha})`;
+        ctx.shadowBlur = r*2.5;
+      } else {
+        ctx.shadowBlur = 0;
+      }
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    requestAnimationFrame(step);
+  }
+
+  window.addEventListener('mousemove', e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+  window.addEventListener('resize', ()=>{ resize(); makeParticles(); });
+
+  resize(); makeParticles(); step();
+})();
+</script>
 </body>
 </html>
