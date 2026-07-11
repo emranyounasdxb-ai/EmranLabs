@@ -37,7 +37,7 @@ export function DesktopTopBar() {
   return (
     <header className="fixed top-3 right-3 left-3 z-[200] flex min-h-12 items-center justify-between rounded-full border border-[var(--glass-border)] bg-[rgba(11,12,16,0.72)] px-4 text-sm shadow-[var(--shadow-panel)] backdrop-blur-xl sm:px-5">
       <div className="flex min-w-0 items-center gap-3">
-        <span className="shrink-0 font-heading font-semibold tracking-[-0.03em]">
+        <span className="font-heading shrink-0 font-semibold tracking-[-0.03em]">
           EMRAN LABS
         </span>
         <span className="hidden h-4 w-px bg-[var(--glass-border)] sm:block" />
