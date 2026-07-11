@@ -15,6 +15,7 @@ type DesktopStore = {
   activeWindowId: DesktopAppId | null;
   nextZIndex: number;
   dockVisible: boolean;
+  commandCenterOpen: boolean;
   openWindow: (appId: DesktopAppId) => void;
   closeWindow: (appId: DesktopAppId) => void;
   minimizeWindow: (appId: DesktopAppId) => void;
@@ -23,6 +24,10 @@ type DesktopStore = {
   setWindowPosition: (appId: DesktopAppId, position: DesktopPoint) => void;
   setWindowSize: (appId: DesktopAppId, size: DesktopRect) => void;
   setDockVisible: (visible: boolean) => void;
+  setCommandCenterOpen: (open: boolean) => void;
+  closeAllWindows: () => void;
+  restoreAllWindows: () => void;
+  resetDesktopLayout: () => void;
 };
 
 const getTopVisibleWindowId = (
@@ -63,6 +68,7 @@ export const useDesktopStore = create<DesktopStore>((set, get) => ({
   activeWindowId: null,
   nextZIndex: 20,
   dockVisible: true,
+  commandCenterOpen: false,
   openWindow: (appId) => {
     const currentState = get();
     const existingWindow = currentState.windows[appId];
@@ -167,4 +173,58 @@ export const useDesktopStore = create<DesktopStore>((set, get) => ({
         : state.windows,
     })),
   setDockVisible: (dockVisible) => set({ dockVisible }),
+  setCommandCenterOpen: (commandCenterOpen) => set({ commandCenterOpen }),
+  closeAllWindows: () => set({ windows: {}, activeWindowId: null }),
+  restoreAllWindows: () =>
+    set((state) => {
+      const entries = Object.values(state.windows).sort(
+        (a, b) => a.zIndex - b.zIndex,
+      );
+      if (entries.length === 0) return state;
+
+      const windows = entries.reduce<
+        Partial<Record<DesktopAppId, DesktopWindowState>>
+      >((nextWindows, windowState, index) => {
+        nextWindows[windowState.appId] = {
+          ...windowState,
+          minimized: false,
+          zIndex: 20 + index,
+        };
+        return nextWindows;
+      }, {});
+
+      return {
+        windows,
+        activeWindowId: entries.at(-1)?.appId ?? null,
+        nextZIndex: 20 + entries.length,
+      };
+    }),
+  resetDesktopLayout: () =>
+    set((state) => {
+      const entries = Object.values(state.windows).sort(
+        (a, b) => a.zIndex - b.zIndex,
+      );
+      if (entries.length === 0) return state;
+
+      const windows = entries.reduce<
+        Partial<Record<DesktopAppId, DesktopWindowState>>
+      >((nextWindows, windowState, index) => {
+        const app = desktopAppMap.get(windowState.appId);
+        if (!app) return nextWindows;
+
+        nextWindows[windowState.appId] = {
+          ...windowState,
+          position: app.defaultPosition,
+          size: app.defaultSize,
+          zIndex: 20 + index,
+        };
+        return nextWindows;
+      }, {});
+
+      return {
+        windows,
+        activeWindowId: getTopVisibleWindowId(windows),
+        nextZIndex: 20 + entries.length,
+      };
+    }),
 }));
