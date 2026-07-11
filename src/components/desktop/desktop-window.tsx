@@ -96,7 +96,12 @@ export function DesktopWindow({
     keepWindowInBounds();
     window.addEventListener("resize", keepWindowInBounds);
     return () => window.removeEventListener("resize", keepWindowInBounds);
-  }, [getClampedPosition, onMove, windowState.position.x, windowState.position.y]);
+  }, [
+    getClampedPosition,
+    onMove,
+    windowState.position.x,
+    windowState.position.y,
+  ]);
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (!isDesktopViewport()) return;
