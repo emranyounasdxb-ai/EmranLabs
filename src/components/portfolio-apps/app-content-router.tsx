@@ -2,6 +2,7 @@ import type { DesktopAppId } from "@/types/desktop";
 
 import { AboutIdentityApp } from "./about-identity-app";
 import { ContactApp } from "./contact-app";
+import { EmAiApp } from "./em-ai-app";
 import { CreativeLabsApp } from "./creative-labs-app";
 import { PortfolioProjectsApp } from "./portfolio-projects-app";
 import { ProfessionalJourneyApp } from "./professional-journey-app";
@@ -18,6 +19,7 @@ export function AppContentRouter({ appId }: AppContentRouterProps) {
   if (appId === "creative-labs") return <CreativeLabsApp />;
   if (appId === "journey") return <ProfessionalJourneyApp />;
   if (appId === "contact") return <ContactApp />;
+  if (appId === "em-ai") return <EmAiApp />;
 
   return <p>This application is planned for a later phase.</p>;
 }

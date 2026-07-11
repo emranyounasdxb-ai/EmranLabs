@@ -2,7 +2,7 @@
 
 Building the Future of AI & Digital Experiences
 
-EMRAN LABS is a futuristic personal technology portfolio that will grow into a premium modern desktop operating-system experience for identity, skills, portfolio work, creative labs, professional journey, contact, and future EM AI functionality.
+EMRAN LABS is a futuristic personal technology portfolio presented as a premium modern desktop operating-system experience for identity, skills, portfolio work, creative labs, professional journey, secure contact, and EM AI portfolio assistance.
 
 ## Step 1 foundation status
 
@@ -28,7 +28,7 @@ The portfolio applications use a typed content system as the single source of tr
 
 About Identity, Skills, Portfolio Projects, and Contact are polished application experiences with categorized content, reusable project cards, accessible in-window project details, and confirmed external links. Creative Labs, Professional Journey, and EM AI remain visible but disabled for later phases.
 
-Selective 3D experiences, cinematic motion, and EM AI functionality remain planned for later phases.
+Selective 3D experiences, cinematic motion, and EM AI functionality continue through later implementation steps.
 
 ## Technology foundation
 
@@ -90,9 +90,46 @@ Create a production build:
 pnpm build
 ```
 
+## Step 6 status
+
+Step 6 has been merged and deployed. It introduced the cinematic desktop background direction, pointer-responsive depth, selective 3D digital core behavior, reduced-motion and WebGL capability safeguards, and deployment-safe production refinements.
+
+## Step 7 status
+
+Step 7 enables EM AI as a portfolio-grounded assistant and upgrades Contact with a secure professional inquiry form. EM AI uses server-side OpenAI Responses API calls only when `OPENAI_API_KEY` and `OPENAI_MODEL` are configured. Contact delivery uses server-side SMTP only when the contact SMTP variables are configured. Missing secrets leave the website, desktop, confirmed channels, and production build functional while the affected service returns a safe unavailable response.
+
+The EM AI and Contact API routes include same-origin checks, Fetch Metadata handling where supported, JSON body limits, Zod validation, bounded in-memory application-level rate limiting, safe public error responses, and operational logging that avoids message bodies, secrets, provider errors, and model output. This limiter is a baseline for the current single cPanel Passenger application and is not a globally distributed rate limiter.
+
+## Environment variables
+
+Required for EM AI service availability:
+
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+
+Required for secure Contact form delivery:
+
+- `CONTACT_SMTP_HOST`
+- `CONTACT_SMTP_PORT`
+- `CONTACT_SMTP_SECURE`
+- `CONTACT_SMTP_USER`
+- `CONTACT_SMTP_PASSWORD`
+- `CONTACT_TO_EMAIL`
+- `CONTACT_FROM_EMAIL`
+
+Optional server-only controls:
+
+- `CONTACT_REPLY_NAME`
+- `CONTACT_RATE_LIMIT_MAX`
+- `CONTACT_RATE_LIMIT_WINDOW_MS`
+- `AI_RATE_LIMIT_MAX`
+- `AI_RATE_LIMIT_WINDOW_MS`
+
+Runtime secrets are configured in cPanel Application Manager. Do not commit real keys, email passwords, SMTP passwords, or production credentials.
+
 ## Deployment
 
-Production deployment is configured for the existing cPanel Passenger application and runs directly from the repository directory. Source files must not be copied, moved, or synced into `public_html` or any other deployment directory.
+Production deployment is configured for the existing cPanel Passenger application and runs directly from `/home/emranlabs/repositories/EmranLabs`. Source files must not be copied, moved, or synced into `public_html` or any other deployment directory.
 
 Application Manager values:
 
@@ -110,14 +147,16 @@ Environment variables:
 
 Deployment sequence:
 
-1. Pull `main` in cPanel Git Version Control.
-2. Run Deploy HEAD Commit so `.cpanel.yml` installs dependencies, builds, and touches `tmp/restart.txt`.
-3. Register or update the application in Application Manager using `repositories/EmranLabs`.
-4. Passenger uses `app.js` as the startup file.
+```bash
+cd /home/emranlabs/repositories/EmranLabs
+bash scripts/deploy-cpanel.sh
+```
+
+Do not use cPanel “Deploy HEAD Commit”. Do not use “Ensure Dependencies”. Do not run `npm install`. Do not use PM2. Do not copy source files into `public_html`. Passenger uses `app.js` as the startup file. Runtime secrets are configured in cPanel Application Manager. `scripts/deploy-cpanel.sh` performs the safe pull, low-memory pnpm install, webpack build, atomic build swap, and Passenger restart.
 
 ## Step 5: Professional Journey and Creative Labs
 
 - Enabled the Professional Journey desktop application with a truthful capability-evolution narrative for the EMRAN LABS professional direction, avoiding fabricated employment history, dates, employers, metrics, or unsupported achievements.
 - Enabled the Creative Labs desktop application as a set of exploration themes and concept directions, with in-window detail views for focus areas, methods, and key exploration questions.
 - Professional Journey and Creative Labs are available through the desktop registry, desktop icons, dock, and Command Center application results.
-- EM AI remains visible but disabled for a later phase.
+- EM AI remained visible but disabled until Step 7.

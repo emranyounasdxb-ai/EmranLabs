@@ -61,7 +61,7 @@ export const desktopApps = [
     title: "Contact",
     shortLabel: "Contact",
     icon: Mail,
-    defaultSize: { width: 520, height: 380 },
+    defaultSize: { width: 760, height: 560 },
     defaultPosition: { x: 390, y: 128 },
     enabled: true,
   },
@@ -70,9 +70,9 @@ export const desktopApps = [
     title: "EM AI",
     shortLabel: "EM AI",
     icon: Bot,
-    defaultSize: { width: 600, height: 440 },
+    defaultSize: { width: 720, height: 560 },
     defaultPosition: { x: 220, y: 220 },
-    enabled: false,
+    enabled: true,
   },
 ] satisfies DesktopApp[];
 
