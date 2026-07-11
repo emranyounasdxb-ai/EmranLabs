@@ -2,8 +2,9 @@
 
 import { Minus, X } from "lucide-react";
 import type { CSSProperties, PointerEvent, ReactNode } from "react";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
+import { cn } from "@/lib/utils";
 import type {
   DesktopApp,
   DesktopPoint,
@@ -24,6 +25,9 @@ type DesktopWindowProps = {
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
+const isDesktopViewport = () =>
+  window.matchMedia("(min-width: 1024px)").matches;
+
 export function DesktopWindow({
   app,
   windowState,
@@ -37,26 +41,68 @@ export function DesktopWindow({
   const dragOffset = useRef<DesktopPoint>({ x: 0, y: 0 });
   const Icon = app.icon;
 
-  const moveWindow = useCallback(
-    (clientX: number, clientY: number) => {
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      if (isMobile) return;
+  const getClampedPosition = useCallback(
+    (x: number, y: number) => {
+      const renderedWidth = Math.min(
+        windowState.size.width,
+        window.innerWidth - 24,
+      );
+      const renderedHeight = Math.min(
+        windowState.size.height,
+        window.innerHeight - 120,
+      );
+      const maxX = Math.max(8, window.innerWidth - renderedWidth - 8);
+      const maxY = Math.max(64, window.innerHeight - renderedHeight - 96);
 
-      const maxX = window.innerWidth - windowState.size.width - 16;
-      const maxY = window.innerHeight - windowState.size.height - 96;
-      onMove({
-        x: clamp(clientX - dragOffset.current.x, 8, Math.max(8, maxX)),
-        y: clamp(clientY - dragOffset.current.y, 64, Math.max(64, maxY)),
-      });
+      return {
+        x: clamp(x, 8, maxX),
+        y: clamp(y, 64, maxY),
+      };
     },
-    [onMove, windowState.size.height, windowState.size.width],
+    [windowState.size.height, windowState.size.width],
   );
 
+  const moveWindow = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!isDesktopViewport()) return;
+
+      onMove(
+        getClampedPosition(
+          clientX - dragOffset.current.x,
+          clientY - dragOffset.current.y,
+        ),
+      );
+    },
+    [getClampedPosition, onMove],
+  );
+
+  useEffect(() => {
+    const keepWindowInBounds = () => {
+      if (!isDesktopViewport()) return;
+
+      const nextPosition = getClampedPosition(
+        windowState.position.x,
+        windowState.position.y,
+      );
+
+      if (
+        nextPosition.x !== windowState.position.x ||
+        nextPosition.y !== windowState.position.y
+      ) {
+        onMove(nextPosition);
+      }
+    };
+
+    keepWindowInBounds();
+    window.addEventListener("resize", keepWindowInBounds);
+    return () => window.removeEventListener("resize", keepWindowInBounds);
+  }, [getClampedPosition, onMove, windowState.position.x, windowState.position.y]);
+
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isDesktopViewport()) return;
     if ((event.target as HTMLElement).closest("button")) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
 
-    onFocus();
     dragOffset.current = {
       x: event.clientX - windowState.position.x,
       y: event.clientY - windowState.position.y,
@@ -70,13 +116,16 @@ export function DesktopWindow({
       aria-label={app.title}
       aria-modal="false"
       onPointerDown={onFocus}
-      className="fixed right-3 bottom-24 left-3 flex max-h-[calc(100dvh-7.5rem)] flex-col overflow-hidden rounded-[var(--radius-panel)] border bg-[rgba(21,23,30,0.86)] shadow-[var(--shadow-panel)] backdrop-blur-2xl transition-[border-color,box-shadow,opacity] duration-[var(--duration-standard)] ease-[var(--motion-ease)] md:right-auto md:bottom-auto md:left-auto md:translate-x-[var(--window-x)] md:translate-y-[var(--window-y)]"
+      className={cn(
+        "fixed right-3 bottom-24 left-3 h-[calc(100dvh-7.5rem)] w-[calc(100vw-1.5rem)] max-h-[calc(100dvh-7.5rem)] flex-col overflow-hidden rounded-[var(--radius-panel)] border bg-[rgba(21,23,30,0.86)] shadow-[var(--shadow-panel)] backdrop-blur-2xl transition-[border-color,box-shadow,opacity] duration-[var(--duration-standard)] ease-[var(--motion-ease)] lg:top-0 lg:right-auto lg:bottom-auto lg:left-0 lg:h-[min(var(--window-height),calc(100dvh-7.5rem))] lg:w-[min(var(--window-width),calc(100vw-1.5rem))] lg:translate-x-[var(--window-x)] lg:translate-y-[var(--window-y)]",
+        active ? "flex" : "hidden lg:flex",
+      )}
       style={
         {
           "--window-x": `${windowState.position.x}px`,
           "--window-y": `${windowState.position.y}px`,
-          width: `min(${windowState.size.width}px, calc(100vw - 1.5rem))`,
-          height: `min(${windowState.size.height}px, calc(100dvh - 7.5rem))`,
+          "--window-width": `${windowState.size.width}px`,
+          "--window-height": `${windowState.size.height}px`,
           zIndex: windowState.zIndex,
           borderColor: active ? "rgba(23,227,192,0.42)" : "var(--glass-border)",
           boxShadow: active
@@ -95,7 +144,7 @@ export function DesktopWindow({
       >
         <div className="flex items-center gap-3">
           <span className="grid size-9 place-items-center rounded-xl border border-[var(--glass-border)] bg-white/[0.055]">
-            <Icon className="size-4" />
+            <Icon aria-hidden="true" className="size-4" />
           </span>
           <h2 className="font-heading text-sm font-semibold tracking-[-0.02em]">
             {app.title}
@@ -108,7 +157,7 @@ export function DesktopWindow({
             aria-label={`Minimize ${app.title}`}
             className="grid min-h-10 min-w-10 place-items-center rounded-full text-[var(--text-secondary)] transition hover:bg-white/10 hover:text-[var(--text-primary)]"
           >
-            <Minus className="size-4" />
+            <Minus aria-hidden="true" className="size-4" />
           </button>
           <button
             type="button"
@@ -116,7 +165,7 @@ export function DesktopWindow({
             aria-label={`Close ${app.title}`}
             className="grid min-h-10 min-w-10 place-items-center rounded-full text-[var(--text-secondary)] transition hover:bg-white/10 hover:text-[var(--text-primary)]"
           >
-            <X className="size-4" />
+            <X aria-hidden="true" className="size-4" />
           </button>
         </div>
       </div>
