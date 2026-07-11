@@ -8,7 +8,21 @@ EMRAN LABS is a futuristic personal technology portfolio that will grow into a p
 
 The current foundation establishes a clean Next.js application with TypeScript, Tailwind CSS, reusable design tokens, site metadata, basic SEO routes, documentation, and a minimal foundation verification page.
 
-The complete desktop experience, floating windows, command palette, selective 3D experiences, advanced motion, and EM AI functionality are intentionally not implemented yet.
+The complete desktop experience, selective 3D experiences, advanced motion, and EM AI functionality are intentionally not implemented yet.
+
+## Step 2 desktop shell status
+
+The current experience now includes the first functional EMRAN LABS desktop shell with a premium full-screen background, top system bar, application workspace, centered dock, typed desktop app registry, and reusable app icon and window frame components.
+
+Window management supports opening, closing, minimizing, restoring, focusing, layering, and desktop pointer dragging with viewport boundary clamping. Enabled Step 2 applications include About Identity, Skills, Portfolio Projects, and Contact, while Creative Labs, Professional Journey, and EM AI remain visible as later-phase applications.
+
+Responsive behavior keeps windows movable on larger screens and presents applications as safer near-full-screen panels with a compact bottom dock on mobile. Keyboard-accessible controls, visible focus states, Escape-to-close behavior, and reduced-motion support are included in the shell foundation.
+
+## Step 3 command center status
+
+The desktop now includes a global Command Center that opens from the top system bar, the compact mobile dock launcher, or Control/Command + K. It searches enabled applications and desktop actions, supports keyboard result navigation, and restores focus when closed.
+
+Desktop actions include minimizing the active window, closing the active window, closing all windows, restoring minimized windows, and resetting open windows to their default layout while preserving minimized state. The command surface adapts from a centered desktop modal to a mobile-safe sheet with accessible dialog semantics and touch-friendly controls.
 
 ## Technology foundation
 
@@ -72,4 +86,25 @@ pnpm build
 
 ## Deployment
 
-Production deployment is not configured yet.
+Production deployment is configured for the existing cPanel Passenger application and runs directly from the repository directory. Source files must not be copied, moved, or synced into `public_html` or any other deployment directory.
+
+Application Manager values:
+
+- Application Name: EmranLabs
+- Deployment Domain: emranlabs.com
+- Base Application URL: /
+- Application Path: repositories/EmranLabs
+- Environment: Production
+
+Environment variables:
+
+- `NODE_ENV=production`
+- `NEXT_TELEMETRY_DISABLED=1`
+- `NEXT_PUBLIC_SITE_URL=https://emranlabs.com`
+
+Deployment sequence:
+
+1. Pull `main` in cPanel Git Version Control.
+2. Run Deploy HEAD Commit so `.cpanel.yml` installs dependencies, builds, and touches `tmp/restart.txt`.
+3. Register or update the application in Application Manager using `repositories/EmranLabs`.
+4. Passenger uses `app.js` as the startup file.
