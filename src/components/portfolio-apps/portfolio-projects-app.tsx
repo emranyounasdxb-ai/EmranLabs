@@ -30,7 +30,10 @@ export function PortfolioProjectsApp() {
           onBack={() => {
             const projectId = selectedProject.id;
             setSelectedProjectId(null);
-            window.setTimeout(() => triggerRefs.current.get(projectId)?.focus(), 0);
+            window.setTimeout(
+              () => triggerRefs.current.get(projectId)?.focus(),
+              0,
+            );
           }}
         />
       </div>
