@@ -10,6 +10,14 @@ The current foundation establishes a clean Next.js application with TypeScript, 
 
 The complete desktop experience, floating windows, command palette, selective 3D experiences, advanced motion, and EM AI functionality are intentionally not implemented yet.
 
+## Step 2 desktop shell status
+
+The current experience now includes the first functional EMRAN LABS desktop shell with a premium full-screen background, top system bar, application workspace, centered dock, typed desktop app registry, and reusable app icon and window frame components.
+
+Window management supports opening, closing, minimizing, restoring, focusing, layering, and desktop pointer dragging with viewport boundary clamping. Enabled Step 2 applications include About Identity, Skills, Portfolio Projects, and Contact, while Creative Labs, Professional Journey, and EM AI remain visible as later-phase applications.
+
+Responsive behavior keeps windows movable on larger screens and presents applications as safer near-full-screen panels with a compact bottom dock on mobile. Keyboard-accessible controls, visible focus states, Escape-to-close behavior, and reduced-motion support are included in the shell foundation.
+
 ## Technology foundation
 
 - Next.js App Router
