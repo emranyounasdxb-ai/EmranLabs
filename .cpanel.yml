@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export PATH=/opt/cpanel/ea-nodejs22/bin:$HOME/.local/bin:$PATH && cd /home/emranlabs/repositories/EmranLabs && pnpm install --frozen-lockfile
-    - export PATH=/opt/cpanel/ea-nodejs22/bin:$HOME/.local/bin:$PATH && cd /home/emranlabs/repositories/EmranLabs && pnpm build
+    - export PATH=/opt/cpanel/ea-nodejs22/bin:$HOME/.local/bin:$PATH && cd /home/emranlabs/repositories/EmranLabs && CI=1 NODE_OPTIONS="--max-old-space-size=384" pnpm install --frozen-lockfile --child-concurrency=1 --network-concurrency=1 --reporter=append-only
+    - export PATH=/opt/cpanel/ea-nodejs22/bin:$HOME/.local/bin:$PATH && cd /home/emranlabs/repositories/EmranLabs && NEXT_TELEMETRY_DISABLED=1 NODE_OPTIONS="--max-old-space-size=512" pnpm build
     - mkdir -p /home/emranlabs/repositories/EmranLabs/tmp
     - touch /home/emranlabs/repositories/EmranLabs/tmp/restart.txt
