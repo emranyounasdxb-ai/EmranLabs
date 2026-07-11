@@ -5,11 +5,13 @@ APP_DIR="/home/emranlabs/repositories/EmranLabs"
 BUILD_DIR=".next-deploy"
 BACKUP_DIR=".next-previous"
 LOCK_DIR="$HOME/.emranlabs-deploy.lock"
+SWAPPED_BUILD=0
 
 export PATH="/opt/cpanel/ea-nodejs22/bin:$HOME/.local/bin:$PATH"
 
 restore_previous_build() {
-  if [[ ! -d "$APP_DIR/.next" && -d "$APP_DIR/$BACKUP_DIR" ]]; then
+  if [[ "$SWAPPED_BUILD" -eq 1 && -d "$APP_DIR/$BACKUP_DIR" ]]; then
+    rm -rf "$APP_DIR/.next"
     mv "$APP_DIR/$BACKUP_DIR" "$APP_DIR/.next"
   fi
 }
@@ -27,7 +29,7 @@ run_deployment() {
   rm -rf "$BUILD_DIR" "$BACKUP_DIR"
 
   echo "Building production release with webpack..."
-  NEXT_DIST_DIR="$BUILD_DIR" \
+  EMRANLABS_DIST_DIR="$BUILD_DIR" \
   NEXT_TELEMETRY_DISABLED=1 \
   NODE_OPTIONS="--max-old-space-size=512" \
     pnpm exec next build --webpack
@@ -41,10 +43,13 @@ run_deployment() {
   fi
 
   mv "$BUILD_DIR" .next
+  SWAPPED_BUILD=1
+
   mkdir -p tmp
   touch tmp/restart.txt
-  rm -rf "$BACKUP_DIR"
 
+  rm -rf "$BACKUP_DIR"
+  SWAPPED_BUILD=0
   trap - ERR
 
   echo "Deployment completed successfully."
