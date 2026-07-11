@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 import { desktopAppMap, desktopApps } from "@/config/desktop-apps";
 import { useDesktopStore } from "@/stores/desktop-store";
 import type { DesktopAppId } from "@/types/desktop";
@@ -90,19 +88,6 @@ export function DesktopWorkspace() {
   const minimizeWindow = useDesktopStore((state) => state.minimizeWindow);
   const focusWindow = useDesktopStore((state) => state.focusWindow);
   const setWindowPosition = useDesktopStore((state) => state.setWindowPosition);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      const isEditable = target?.matches(
-        "input, textarea, select, [contenteditable='true']",
-      );
-      if (event.key === "Escape" && activeWindowId && !isEditable)
-        closeWindow(activeWindowId);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeWindowId, closeWindow]);
 
   return (
     <main
