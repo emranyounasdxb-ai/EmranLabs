@@ -114,3 +114,10 @@ Deployment sequence:
 2. Run Deploy HEAD Commit so `.cpanel.yml` installs dependencies, builds, and touches `tmp/restart.txt`.
 3. Register or update the application in Application Manager using `repositories/EmranLabs`.
 4. Passenger uses `app.js` as the startup file.
+
+## Step 5: Professional Journey and Creative Labs
+
+- Enabled the Professional Journey desktop application with a truthful capability-evolution narrative for the EMRAN LABS professional direction, avoiding fabricated employment history, dates, employers, metrics, or unsupported achievements.
+- Enabled the Creative Labs desktop application as a set of exploration themes and concept directions, with in-window detail views for focus areas, methods, and key exploration questions.
+- Professional Journey and Creative Labs are available through the desktop registry, desktop icons, dock, and Command Center application results.
+- EM AI remains visible but disabled for a later phase.
