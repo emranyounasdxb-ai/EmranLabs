@@ -22,6 +22,12 @@ The desktop includes a global Command Center that opens from the top system bar,
 
 Desktop actions include minimizing the active window, closing the active window, closing all windows, restoring minimized windows, and resetting open windows to their default layout while preserving minimized state. The command surface adapts from a centered desktop modal to a mobile-safe sheet with accessible dialog semantics and touch-friendly controls.
 
+## Step 4 portfolio applications status
+
+The portfolio applications use a typed content system as the single source of truth for identity, focus areas, skill groups, product ecosystems, and confirmed professional channels.
+
+About Identity, Skills, Portfolio Projects, and Contact are polished application experiences with categorized content, reusable project cards, accessible in-window project details, and confirmed external links. Creative Labs, Professional Journey, and EM AI remain visible but disabled for later phases.
+
 Selective 3D experiences, cinematic motion, and EM AI functionality remain planned for later phases.
 
 ## Technology foundation
