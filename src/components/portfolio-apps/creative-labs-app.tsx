@@ -30,7 +30,10 @@ export function CreativeLabsApp() {
           onBack={() => {
             const labId = selectedLab.id;
             setSelectedLabId(null);
-            window.setTimeout(() => triggerRefs.current.get(labId)?.focus(), 0);
+            window.setTimeout(
+              () => triggerRefs.current.get(labId)?.focus(),
+              0,
+            );
           }}
         />
       </div>
@@ -43,7 +46,7 @@ export function CreativeLabsApp() {
         eyebrow="Creative labs"
         title="Exploration themes and concept directions"
         titleId="creative-labs-title"
-        description="Creative Labs contains exploration themes only. Items are not presented as launched products, completed experiments, or commercial results."
+        description="A collection of research themes, concept directions, and planned experiments exploring practical product ideas before production decisions are made."
       />
       <div className="grid gap-4 lg:grid-cols-2">
         {creativeLabs.map((lab) => (
