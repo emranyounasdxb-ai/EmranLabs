@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 
 import { desktopApps } from "@/config/desktop-apps";
+import { motionTransitions } from "@/config/motion";
 import { useDesktopStore } from "@/stores/desktop-store";
 
 import { DesktopAppIcon } from "./desktop-app-icon";
@@ -26,6 +27,7 @@ export function DesktopDock() {
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={motionTransitions.standard}
         className="flex max-w-full gap-2 overflow-x-auto rounded-[2rem] border border-[var(--glass-border)] bg-[rgba(11,12,16,0.76)] p-2 shadow-[var(--shadow-panel)] backdrop-blur-xl"
       >
         <button

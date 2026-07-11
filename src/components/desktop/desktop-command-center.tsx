@@ -147,11 +147,12 @@ export function DesktopCommandCenter() {
       setActiveIndex(0);
       inputRef.current?.focus();
     }, 0);
-
-    return () => {
-      openerRef.current?.focus();
-    };
   }, [commandCenterOpen]);
+
+  const restoreOpenerFocus = useCallback(() => {
+    openerRef.current?.focus();
+    openerRef.current = null;
+  }, []);
 
   const safeActiveIndex = Math.min(
     activeIndex,
@@ -212,7 +213,7 @@ export function DesktopCommandCenter() {
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={restoreOpenerFocus}>
       {commandCenterOpen && (
         <motion.div
           variants={overlayMotionVariants}
