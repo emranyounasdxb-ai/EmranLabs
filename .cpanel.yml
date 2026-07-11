@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export PATH=/opt/cpanel/ea-nodejs22/bin:$HOME/.local/bin:$PATH && cd /home/emranlabs/repositories/EmranLabs && pnpm install --frozen-lockfile
+    - export PATH=/opt/cpanel/ea-nodejs22/bin:$HOME/.local/bin:$PATH && cd /home/emranlabs/repositories/EmranLabs && pnpm build
+    - mkdir -p /home/emranlabs/repositories/EmranLabs/tmp
+    - touch /home/emranlabs/repositories/EmranLabs/tmp/restart.txt
