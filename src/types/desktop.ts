@@ -38,9 +38,7 @@ export type DesktopWindowState = {
 };
 
 export type DesktopCommandCategory =
-  | "application"
-  | "desktop-action"
-  | "planned";
+  "application" | "desktop-action" | "planned";
 
 export type DesktopCommandAction =
   | { type: "open-app"; appId: DesktopAppId }
@@ -51,10 +49,7 @@ export type DesktopCommandAction =
   | { type: "reset-desktop-layout" };
 
 export type DesktopCommandAvailability =
-  | "always"
-  | "has-active-window"
-  | "has-open-windows"
-  | "has-minimized-windows";
+  "always" | "has-active-window" | "has-open-windows" | "has-minimized-windows";
 
 export type DesktopCommand = {
   id: string;
