@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { AnalyticsScript } from "@/components/seo/analytics-script";
+import { GoogleTagManagerConsent } from "@/components/seo/google-tag-manager-consent";
 import { StructuredData } from "@/components/seo/structured-data";
 import { siteConfig, getSiteUrl } from "@/config/site";
 import { getAnalyticsConfig } from "@/lib/analytics/config";
@@ -73,7 +73,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <StructuredData />
-        {analytics && <AnalyticsScript config={analytics} />}
+        {analytics && <GoogleTagManagerConsent config={analytics} />}
         {children}
       </body>
     </html>

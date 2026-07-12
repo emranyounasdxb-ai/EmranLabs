@@ -189,22 +189,51 @@ The Contact application submits bounded validated JSON to the server route. Deli
 
 ### Optional analytics configuration
 
-Privacy-respecting Plausible-compatible analytics is disabled by default. Enable it only with public variables:
+Optional Google Analytics is enabled only through Google Tag Manager after a visitor allows analytics. Use one public variable:
 
-- `NEXT_PUBLIC_ANALYTICS_ENABLED`
-- `NEXT_PUBLIC_ANALYTICS_DOMAIN`
-- `NEXT_PUBLIC_ANALYTICS_SCRIPT_URL`
+- `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID`
 
-The implementation only emits predefined non-sensitive product events and never tracks AI message bodies, AI responses, contact names, contact email addresses, companies, subjects, messages, SMTP data, OpenAI request content, or full conversation history.
+The implementation stores only the local consent choice (`granted` or `denied`) and emits predefined non-sensitive product events after consent. It never sends AI message bodies, AI responses, contact names, contact email addresses, companies, subjects, messages, SMTP data, OpenAI request content, or full conversation history.
+
+### Google Tag Manager and Google Analytics 4 setup
+
+A. Google Analytics:
+
+- Create or select the EMRAN LABS GA4 property.
+- Create the web data stream for `https://emranlabs.com`.
+- Copy the Measurement ID that begins with `G-`. Do not commit it to source code.
+
+B. Google Tag Manager:
+
+- Create or select the EMRAN LABS Web container.
+- Copy the container ID that begins with `GTM-`.
+- Add the GTM container ID to cPanel Application Manager as `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID=GTM-...`.
+- Rebuild and deploy after changing this `NEXT_PUBLIC` variable.
+
+C. Inside GTM:
+
+- Create a Google Tag.
+- Enter the GA4 Tag ID / Measurement ID beginning with `G-`.
+- Use the appropriate initialization/all-pages trigger.
+- Configure consent requirements so analytics tags require `analytics_storage`.
+- Create GA4 event handling for approved custom event names: `application_opened`, `project_detail_opened`, `command_center_opened`, `contact_form_submitted`, and `em_ai_opened`.
+- Verify with Tag Assistant Preview.
+- Publish the GTM container only after successful verification.
+
+D. Verification:
+
+- Confirm GTM in Tag Assistant.
+- Confirm the GA4 Realtime report receives a visit after consent.
+- Confirm no analytics request occurs after Decline.
+- Confirm no duplicate `page_view` events.
+- Confirm custom event names appear only after consent.
 
 ### Required environment variables
 
 Public:
 
 - `NEXT_PUBLIC_SITE_URL`
-- `NEXT_PUBLIC_ANALYTICS_ENABLED`
-- `NEXT_PUBLIC_ANALYTICS_DOMAIN`
-- `NEXT_PUBLIC_ANALYTICS_SCRIPT_URL`
+- `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID`
 
 Server-only:
 
@@ -239,7 +268,7 @@ Do not use cPanel “Deploy HEAD Commit”. Do not use “Ensure Dependencies”
 - DNS resolves to the canonical HTTPS domain.
 - `NEXT_PUBLIC_SITE_URL` matches the canonical production origin.
 - OpenAI and SMTP variables are configured or unavailable states are accepted.
-- Optional analytics is either disabled or configured with a safe Plausible-compatible script URL.
+- Optional analytics is either disabled or configured with a valid Google Tag Manager container ID and visitor consent.
 - `/robots.txt`, `/sitemap.xml`, `/manifest.webmanifest`, `/opengraph-image`, `/twitter-image`, and `/favicon.ico` respond successfully.
 - Desktop smoke test covers About, Skills, Projects, Creative Labs, Journey, Contact, EM AI, Dock, Command Center, window open/focus/move/minimize/restore/close, and no console hydration errors.
 - Mobile smoke test covers 390px, 430px, 768px, 1024px, and 1440px widths where practical.
@@ -256,4 +285,4 @@ If production smoke tests fail after deployment, restore the previous known-good
 
 ### Security limitations and future hardening
 
-Current hardening includes safe browser headers, same-origin and Fetch Metadata request guards, bounded payloads, rate limiting, generic public API errors, server-only OpenAI/SMTP integrations, and no committed secrets. A strict Content Security Policy is intentionally deferred until it can be fully tested with Next.js runtime scripts, optional analytics, fonts, and WebGL without breaking the desktop experience.
+Current hardening includes safe browser headers, same-origin and Fetch Metadata request guards, bounded payloads, rate limiting, generic public API errors, server-only OpenAI/SMTP integrations, consent-aware optional Google Tag Manager loading, and no committed secrets. A strict Content Security Policy is intentionally deferred until it can be fully tested with Next.js runtime scripts, optional analytics, fonts, and WebGL without breaking the desktop experience.
