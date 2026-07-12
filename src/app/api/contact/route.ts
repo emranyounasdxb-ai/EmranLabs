@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { contactRequestSchema } from "@/lib/validation/contact";
 import {
   clientKey,
   errorJson,
-  validateJsonRequest,
+  jsonResponse,
+  readBoundedJson,
   validateSameOrigin,
   zodFieldErrors,
 } from "@/lib/server/request-guards";
@@ -16,16 +16,19 @@ import { createRequestId, logRouteEvent } from "@/lib/server/safe-logging";
 
 export const runtime = "nodejs";
 const limiter = new SlidingWindowRateLimiter(
-  envInt("CONTACT_RATE_LIMIT_MAX", 5),
-  envInt("CONTACT_RATE_LIMIT_WINDOW_MS", 15 * 60 * 1000),
+  envInt("CONTACT_RATE_LIMIT_MAX", 5, 1, 120),
+  envInt(
+    "CONTACT_RATE_LIMIT_WINDOW_MS",
+    15 * 60 * 1000,
+    10_000,
+    60 * 60 * 1000,
+  ),
 );
 
 export async function POST(request: Request) {
   const requestId = createRequestId();
   const started = Date.now();
-  const guarded =
-    validateSameOrigin(request, requestId) ??
-    validateJsonRequest(request, requestId, 12_000);
+  const guarded = validateSameOrigin(request, requestId);
   if (guarded) return guarded;
   const limited = limiter.check(clientKey(request));
   if (!limited.allowed)
@@ -36,30 +39,23 @@ export async function POST(request: Request) {
       429,
       { retryAfter: limited.retryAfter },
     );
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return errorJson(
-      "VALIDATION_ERROR",
-      "Please send valid JSON.",
-      requestId,
-      400,
-    );
-  }
+
+  const json = await readBoundedJson(request, requestId, 12_000);
+  if (!json.ok) return json.response;
+
   if (
-    json &&
-    typeof json === "object" &&
-    "website" in json &&
-    String((json as { website?: unknown }).website ?? "").length > 0
+    json.value &&
+    typeof json.value === "object" &&
+    "website" in json.value &&
+    String((json.value as { website?: unknown }).website ?? "").length > 0
   ) {
-    return NextResponse.json({
+    return jsonResponse({
       ok: true,
       message: "Thank you. Your inquiry has been received.",
       requestId,
     });
   }
-  const parsed = contactRequestSchema.safeParse(json);
+  const parsed = contactRequestSchema.safeParse(json.value);
   if (!parsed.success)
     return errorJson(
       "VALIDATION_ERROR",
@@ -84,7 +80,7 @@ export async function POST(request: Request) {
       status: "ok",
       durationMs: Date.now() - started,
     });
-    return NextResponse.json({
+    return jsonResponse({
       ok: true,
       message: "Thank you. Your inquiry has been received.",
       requestId,

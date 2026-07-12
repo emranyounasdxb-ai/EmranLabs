@@ -98,14 +98,14 @@ Step 6 has been merged and deployed. It introduced the cinematic desktop backgro
 
 Step 7 enables EM AI as a portfolio-grounded assistant and upgrades Contact with a secure professional inquiry form. EM AI uses server-side OpenAI Responses API calls only when `OPENAI_API_KEY` and `OPENAI_MODEL` are configured. Contact delivery uses server-side SMTP only when the contact SMTP variables are configured. Missing secrets leave the website, desktop, confirmed channels, and production build functional while the affected service returns a safe unavailable response.
 
-The EM AI and Contact API routes include same-origin checks, Fetch Metadata handling where supported, JSON body limits, Zod validation, bounded in-memory application-level rate limiting, safe public error responses, and operational logging that avoids message bodies, secrets, provider errors, and model output. This limiter is a baseline for the current single cPanel Passenger application and is not a globally distributed rate limiter.
+The EM AI and Contact API routes include same-origin checks, Fetch Metadata handling where supported, JSON body limits, Zod validation, bounded in-memory application-level rate limiting, safe public error responses, and operational logging that avoids message bodies, secrets, provider errors, and model output. This limiter is a baseline for the current single cPanel Passenger application and is not a globally distributed rate limiter. Client identifiers are derived from cPanel Passenger proxy headers with `x-real-ip` expected as the canonical client address when present; raw IP addresses are never logged or persisted.
 
 ## Environment variables
 
 Required for EM AI service availability:
 
 - `OPENAI_API_KEY`
-- `OPENAI_MODEL`
+- `OPENAI_MODEL` — set this to a Responses API-compatible model available to the configured OpenAI project.
 
 Required for secure Contact form delivery:
 

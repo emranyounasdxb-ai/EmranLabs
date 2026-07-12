@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { emAiRequestSchema } from "@/lib/validation/em-ai";
 import {
   clientKey,
   errorJson,
-  validateJsonRequest,
+  jsonResponse,
+  readBoundedJson,
   validateSameOrigin,
   zodFieldErrors,
 } from "@/lib/server/request-guards";
@@ -17,16 +17,14 @@ import {
 
 export const runtime = "nodejs";
 const limiter = new SlidingWindowRateLimiter(
-  envInt("AI_RATE_LIMIT_MAX", 12),
-  envInt("AI_RATE_LIMIT_WINDOW_MS", 10 * 60 * 1000),
+  envInt("AI_RATE_LIMIT_MAX", 12, 1, 120),
+  envInt("AI_RATE_LIMIT_WINDOW_MS", 10 * 60 * 1000, 10_000, 60 * 60 * 1000),
 );
 
 export async function POST(request: Request) {
   const requestId = createRequestId();
   const started = Date.now();
-  const guarded =
-    validateSameOrigin(request, requestId) ??
-    validateJsonRequest(request, requestId, 16_000);
+  const guarded = validateSameOrigin(request, requestId);
   if (guarded) return guarded;
   const limited = limiter.check(clientKey(request));
   if (!limited.allowed)
@@ -37,18 +35,11 @@ export async function POST(request: Request) {
       429,
       { retryAfter: limited.retryAfter },
     );
-  let json: unknown;
-  try {
-    json = await request.json();
-  } catch {
-    return errorJson(
-      "VALIDATION_ERROR",
-      "Please send valid JSON.",
-      requestId,
-      400,
-    );
-  }
-  const parsed = emAiRequestSchema.safeParse(json);
+
+  const json = await readBoundedJson(request, requestId, 16_000);
+  if (!json.ok) return json.response;
+
+  const parsed = emAiRequestSchema.safeParse(json.value);
   if (!parsed.success)
     return errorJson(
       "VALIDATION_ERROR",
@@ -91,7 +82,7 @@ export async function POST(request: Request) {
       status: "ok",
       durationMs: Date.now() - started,
     });
-    return NextResponse.json({
+    return jsonResponse({
       ok: true,
       message: { role: "assistant", content: answer },
       requestId,

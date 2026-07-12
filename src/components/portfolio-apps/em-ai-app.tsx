@@ -15,6 +15,31 @@ const prompts = [
 ];
 const limit = 1500;
 
+async function readApiResponse(response: Response) {
+  try {
+    return (await response.json()) as EmAiResponse;
+  } catch {
+    return {
+      ok: false as const,
+      code: "INTERNAL_ERROR" as const,
+      message: "EM AI returned an unexpected response. Please try again later.",
+      requestId: "unavailable",
+    };
+  }
+}
+
+function mapEmAiMessage(data: Extract<EmAiResponse, { ok: false }>) {
+  if (data.code === "RATE_LIMITED")
+    return "Please wait before trying EM AI again.";
+  if (data.code === "AI_UNAVAILABLE")
+    return "EM AI is temporarily unavailable. Please use the Contact application for professional inquiries.";
+  if (data.code === "AI_BLOCKED")
+    return "I cannot help with that request. Please keep questions focused on the EMRAN LABS portfolio.";
+  if (data.code === "AI_TIMEOUT")
+    return "EM AI timed out. Please try a shorter portfolio-focused question.";
+  return data.message;
+}
+
 export function EmAiApp() {
   const [messages, setMessages] = useState<EmAiMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -23,10 +48,18 @@ export function EmAiApp() {
   );
   const [pending, setPending] = useState(false);
   const controller = useRef<AbortController | null>(null);
+  const requestSeq = useRef(0);
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
   }, [messages, pending]);
+
+  useEffect(() => {
+    return () => {
+      requestSeq.current += 1;
+      controller.current?.abort();
+    };
+  }, []);
 
   async function send(text = draft) {
     const content = text.trim();
@@ -36,6 +69,9 @@ export function EmAiApp() {
     setDraft("");
     setPending(true);
     setStatus("EM AI is generating a concise portfolio response.");
+    controller.current?.abort();
+    const currentSeq = requestSeq.current + 1;
+    requestSeq.current = currentSeq;
     controller.current = new AbortController();
     try {
       const response = await fetch("/api/em-ai", {
@@ -46,15 +82,17 @@ export function EmAiApp() {
         }),
         signal: controller.current.signal,
       });
-      const data = (await response.json()) as EmAiResponse;
+      const data = await readApiResponse(response);
+      if (requestSeq.current !== currentSeq) return;
       if (data.ok) {
         setMessages([...next, { ...data.message, id: data.requestId }]);
         setStatus("EM AI response received.");
       } else {
         setDraft(content);
-        setStatus(data.message);
+        setStatus(mapEmAiMessage(data));
       }
     } catch (error) {
+      if (requestSeq.current !== currentSeq) return;
       setDraft(content);
       setStatus(
         error instanceof DOMException && error.name === "AbortError"
@@ -62,8 +100,10 @@ export function EmAiApp() {
           : "Network problem. Your message was preserved.",
       );
     } finally {
-      setPending(false);
-      controller.current = null;
+      if (requestSeq.current === currentSeq) {
+        setPending(false);
+        controller.current = null;
+      }
     }
   }
 
@@ -184,6 +224,10 @@ export function EmAiApp() {
           <button
             type="button"
             onClick={() => {
+              requestSeq.current += 1;
+              controller.current?.abort();
+              controller.current = null;
+              setPending(false);
               setMessages([]);
               setStatus("Conversation cleared.");
             }}

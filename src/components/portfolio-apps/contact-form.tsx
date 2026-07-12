@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { cloneElement, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { contactInquiryTypes, type ContactFormValues } from "@/types/contact";
 import type { ApiErrorResponse } from "@/types/em-ai";
+
+const CONTACT_STATUS_ID = "contact-status";
 
 const initial = (): ContactFormValues => ({
   name: "",
@@ -17,6 +19,30 @@ const initial = (): ContactFormValues => ({
   startedAt: Date.now(),
 });
 
+async function readApiResponse(response: Response) {
+  try {
+    return (await response.json()) as
+      { ok: true; message: string; requestId?: string } | ApiErrorResponse;
+  } catch {
+    return {
+      ok: false as const,
+      code: "INTERNAL_ERROR" as const,
+      message:
+        "The service returned an unexpected response. Please try again later.",
+      requestId: "unavailable",
+    };
+  }
+}
+
+function mapContactMessage(data: ApiErrorResponse) {
+  if (data.code === "RATE_LIMITED")
+    return "Please wait before sending another inquiry.";
+  if (data.code === "CONTACT_UNAVAILABLE")
+    return "The inquiry form is temporarily unavailable. Please use the confirmed professional channels.";
+  if (data.code === "VALIDATION_ERROR") return data.message;
+  return "The inquiry could not be sent right now. Please try again later or use a confirmed channel.";
+}
+
 export function ContactForm() {
   const [values, setValues] = useState<ContactFormValues>(() => initial());
   const [pending, setPending] = useState(false);
@@ -24,13 +50,21 @@ export function ContactForm() {
     "Use this form for professional product, software, AI, web, mobile, architecture, and collaboration inquiries.",
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const describedBy = useMemo(() => "contact-status", []);
+  const fieldRefs = useRef<
+    Record<
+      string,
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
+    >
+  >({});
+  const summaryRef = useRef<HTMLDivElement>(null);
+
   function update<K extends keyof ContactFormValues>(
     key: K,
     value: ContactFormValues[K],
   ) {
     setValues((current) => ({ ...current, [key]: value }));
   }
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (pending) return;
@@ -43,14 +77,20 @@ export function ContactForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(values),
       });
-      const data = (await response.json()) as
-        { ok: true; message: string } | ApiErrorResponse;
+      const data = await readApiResponse(response);
       if (data.ok) {
         setStatus(data.message);
         setValues(initial());
       } else {
-        setStatus(data.message);
-        setErrors(data.fieldErrors ?? {});
+        const nextErrors = data.fieldErrors ?? {};
+        setStatus(mapContactMessage(data));
+        setErrors(nextErrors);
+        setTimeout(() => {
+          const first = Object.keys(nextErrors)[0];
+          if (first && fieldRefs.current[first])
+            fieldRefs.current[first]?.focus();
+          else summaryRef.current?.focus();
+        }, 0);
       }
     } catch {
       setStatus(
@@ -60,8 +100,7 @@ export function ContactForm() {
       setPending(false);
     }
   }
-  const field =
-    "w-full rounded-2xl border border-[var(--glass-border)] bg-white/[0.045] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[rgba(23,227,192,0.55)]";
+
   return (
     <form
       onSubmit={submit}
@@ -77,6 +116,16 @@ export function ContactForm() {
           information, or other sensitive data.
         </p>
       </div>
+      {Object.keys(errors).length > 0 && (
+        <div
+          ref={summaryRef}
+          tabIndex={-1}
+          className="rounded-2xl border border-red-200/50 bg-red-200/10 p-3 text-sm text-red-100"
+          role="alert"
+        >
+          Please review the highlighted fields before sending.
+        </div>
+      )}
       <input
         type="text"
         tabIndex={-1}
@@ -87,18 +136,34 @@ export function ContactForm() {
         aria-hidden="true"
       />
       <div className="grid gap-3 md:grid-cols-2">
-        <Field label="Name" error={errors.name}>
+        <Field
+          id="contact-name"
+          name="name"
+          label="Name"
+          required
+          error={errors.name}
+          inputRef={(node) => {
+            fieldRefs.current.name = node;
+          }}
+        >
           <input
-            className={field}
             required
             value={values.name}
             onChange={(e) => update("name", e.target.value)}
             maxLength={80}
           />
         </Field>
-        <Field label="Email" error={errors.email}>
+        <Field
+          id="contact-email"
+          name="email"
+          label="Email"
+          required
+          error={errors.email}
+          inputRef={(node) => {
+            fieldRefs.current.email = node;
+          }}
+        >
           <input
-            className={field}
             required
             type="email"
             value={values.email}
@@ -107,17 +172,33 @@ export function ContactForm() {
           />
         </Field>
       </div>
-      <Field label="Company or organization (optional)" error={errors.company}>
+      <Field
+        id="contact-company"
+        name="company"
+        label="Company or organization"
+        help="Optional."
+        error={errors.company}
+        inputRef={(node) => {
+          fieldRefs.current.company = node;
+        }}
+      >
         <input
-          className={field}
           value={values.company}
           onChange={(e) => update("company", e.target.value)}
           maxLength={120}
         />
       </Field>
-      <Field label="Inquiry type" error={errors.inquiryType}>
+      <Field
+        id="contact-inquiry-type"
+        name="inquiryType"
+        label="Inquiry type"
+        required
+        error={errors.inquiryType}
+        inputRef={(node) => {
+          fieldRefs.current.inquiryType = node;
+        }}
+      >
         <select
-          className={field}
           value={values.inquiryType}
           onChange={(e) =>
             update(
@@ -131,39 +212,79 @@ export function ContactForm() {
           ))}
         </select>
       </Field>
-      <Field label="Subject" error={errors.subject}>
+      <Field
+        id="contact-subject"
+        name="subject"
+        label="Subject"
+        required
+        error={errors.subject}
+        inputRef={(node) => {
+          fieldRefs.current.subject = node;
+        }}
+      >
         <input
-          className={field}
           required
           value={values.subject}
           onChange={(e) => update("subject", e.target.value)}
           maxLength={140}
         />
       </Field>
-      <Field label="Message" error={errors.message}>
+      <Field
+        id="contact-message"
+        name="message"
+        label="Message"
+        required
+        error={errors.message}
+        inputRef={(node) => {
+          fieldRefs.current.message = node;
+        }}
+        textarea
+      >
         <textarea
-          className={`${field} min-h-32 resize-none`}
           required
           value={values.message}
           onChange={(e) => update("message", e.target.value)}
           maxLength={3000}
         />
       </Field>
-      <label className="flex gap-3 text-sm text-[var(--text-secondary)]">
-        <input
-          type="checkbox"
-          checked={values.consent}
-          onChange={(e) => update("consent", e.target.checked)}
-          className="mt-1 size-4"
-        />
-        I consent to EMRAN LABS receiving this inquiry by email and understand
-        the configured mailbox will store the delivered message.
-      </label>
-      {errors.consent && (
-        <p className="text-xs text-red-200">{errors.consent}</p>
-      )}
+      <div>
+        <label
+          htmlFor="contact-consent"
+          className="flex gap-3 text-sm text-[var(--text-secondary)]"
+        >
+          <input
+            id="contact-consent"
+            ref={(node) => {
+              fieldRefs.current.consent = node;
+            }}
+            type="checkbox"
+            required
+            checked={values.consent}
+            onChange={(e) => update("consent", e.target.checked)}
+            aria-invalid={Boolean(errors.consent)}
+            aria-describedby={`contact-consent-help${errors.consent ? " contact-consent-error" : ""}`}
+            className="mt-1 size-4"
+          />
+          <span>
+            <span aria-hidden="true">*</span> I consent to EMRAN LABS receiving
+            this inquiry by email and understand the configured mailbox will
+            store the delivered message.
+          </span>
+        </label>
+        <p
+          id="contact-consent-help"
+          className="mt-1 text-xs text-[var(--text-secondary)]"
+        >
+          Required to send the inquiry.
+        </p>
+        {errors.consent && (
+          <p id="contact-consent-error" className="mt-1 text-xs text-red-200">
+            Error: {errors.consent}
+          </p>
+        )}
+      </div>
       <p
-        id={describedBy}
+        id={CONTACT_STATUS_ID}
         aria-live="polite"
         className="text-xs leading-5 text-[var(--text-secondary)]"
       >
@@ -182,21 +303,65 @@ export function ContactForm() {
 }
 
 function Field({
+  id,
+  name,
   label,
+  help,
   error,
+  required,
   children,
+  inputRef,
+  textarea = false,
 }: {
+  id: string;
+  name: string;
   label: string;
+  help?: string;
   error?: string;
-  children: React.ReactNode;
+  required?: boolean;
+  children: React.ReactElement<Record<string, unknown>>;
+  inputRef: (
+    node: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null,
+  ) => void;
+  textarea?: boolean;
 }) {
+  const helpId = `${id}-help`;
+  const errorId = `${id}-error`;
+  const describedBy = [
+    help ? helpId : null,
+    error ? errorId : null,
+    CONTACT_STATUS_ID,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const className = `w-full rounded-2xl border ${error ? "border-red-200/70" : "border-[var(--glass-border)]"} bg-white/[0.045] px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[rgba(23,227,192,0.55)] ${textarea ? "min-h-32 resize-none" : ""}`;
   return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium text-[var(--text-primary)]">
-        {label}
-      </span>
-      {children}
-      {error && <span className="block text-xs text-red-200">{error}</span>}
-    </label>
+    <div className="space-y-1.5">
+      <label
+        htmlFor={id}
+        className="text-sm font-medium text-[var(--text-primary)]"
+      >
+        {label} {required && <span aria-hidden="true">*</span>}
+      </label>
+      {required && <span className="sr-only">Required</span>}
+      {help && (
+        <p id={helpId} className="text-xs text-[var(--text-secondary)]">
+          {help}
+        </p>
+      )}
+      {cloneElement(children, {
+        id,
+        name,
+        ref: inputRef,
+        className,
+        "aria-invalid": Boolean(error),
+        "aria-describedby": describedBy || undefined,
+      })}
+      {error && (
+        <p id={errorId} className="text-xs text-red-200">
+          Error: {error}
+        </p>
+      )}
+    </div>
   );
 }
