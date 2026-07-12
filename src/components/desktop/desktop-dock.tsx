@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { desktopApps } from "@/config/desktop-apps";
 import { motionTransitions } from "@/config/motion";
 import { useDesktopStore } from "@/stores/desktop-store";
+import { trackEvent } from "@/lib/analytics/client";
 
 import { DesktopAppIcon } from "./desktop-app-icon";
 
@@ -32,7 +33,10 @@ export function DesktopDock() {
       >
         <button
           type="button"
-          onClick={() => setCommandCenterOpen(true)}
+          onClick={() => {
+            setCommandCenterOpen(true);
+            trackEvent("command_center_opened");
+          }}
           aria-label="Open command center"
           className="grid min-h-12 min-w-12 place-items-center rounded-2xl border border-[var(--glass-border)] bg-white/[0.055] text-[var(--text-primary)] transition hover:border-[rgba(23,227,192,0.42)] hover:bg-white/[0.085] sm:hidden"
         >
@@ -50,8 +54,13 @@ export function DesktopDock() {
               minimized={windowState?.minimized}
               onClick={() => {
                 if (!app.enabled) return;
-                if (!windowState) openWindow(app.id);
-                else if (active && !windowState.minimized)
+                if (!windowState) {
+                  openWindow(app.id);
+                  trackEvent(
+                    app.id === "em-ai" ? "em_ai_opened" : "application_opened",
+                    { app: app.id },
+                  );
+                } else if (active && !windowState.minimized)
                   minimizeWindow(app.id);
                 else restoreWindow(app.id);
               }}

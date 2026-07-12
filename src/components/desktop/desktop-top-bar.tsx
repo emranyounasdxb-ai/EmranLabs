@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { desktopAppMap } from "@/config/desktop-apps";
 import { useDesktopStore } from "@/stores/desktop-store";
+import { trackEvent } from "@/lib/analytics/client";
 
 import { DesktopShortcutHint } from "./desktop-shortcut-hint";
 
@@ -48,7 +49,10 @@ export function DesktopTopBar() {
       <div className="flex shrink-0 items-center gap-2 text-[var(--text-secondary)]">
         <button
           type="button"
-          onClick={() => setCommandCenterOpen(true)}
+          onClick={() => {
+            setCommandCenterOpen(true);
+            trackEvent("command_center_opened");
+          }}
           aria-label="Open command center"
           className="flex min-h-10 min-w-10 items-center justify-center gap-2 rounded-full border border-[var(--glass-border)] bg-white/[0.055] px-3 text-[var(--text-primary)] transition hover:border-[rgba(23,227,192,0.42)] hover:bg-white/[0.085]"
         >

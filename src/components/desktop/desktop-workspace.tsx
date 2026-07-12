@@ -5,6 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { AppContentRouter } from "@/components/portfolio-apps/app-content-router";
 import { desktopAppMap, desktopApps } from "@/config/desktop-apps";
 import { useDesktopStore } from "@/stores/desktop-store";
+import { trackEvent } from "@/lib/analytics/client";
 
 import { DesktopAppIcon } from "./desktop-app-icon";
 import { DesktopWindow } from "./desktop-window";
@@ -20,6 +21,8 @@ export function DesktopWorkspace() {
 
   return (
     <main
+      id="desktop-main"
+      aria-label="EMRAN LABS desktop applications"
       className="relative z-10 min-h-screen overflow-hidden px-4 pt-20 pb-28"
       onPointerDown={(event) => {
         if (event.target === event.currentTarget)
@@ -31,7 +34,13 @@ export function DesktopWorkspace() {
           <DesktopAppIcon
             key={app.id}
             app={app}
-            onClick={() => openWindow(app.id)}
+            onClick={() => {
+              openWindow(app.id);
+              trackEvent(
+                app.id === "em-ai" ? "em_ai_opened" : "application_opened",
+                { app: app.id },
+              );
+            }}
           />
         ))}
       </div>

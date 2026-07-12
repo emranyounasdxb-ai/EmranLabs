@@ -72,6 +72,14 @@ export function ContactApp() {
             channels remain available if the form service is temporarily
             unavailable.
           </div>
+          <div className="rounded-2xl border border-[var(--glass-border)] bg-white/[0.035] p-4 text-xs leading-5 text-[var(--text-secondary)]">
+            Privacy note: optional Google Analytics may be enabled through
+            Google Tag Manager after you allow analytics. Your consent choice is
+            stored locally in this browser, and sensitive Contact or EM AI
+            content is not included in analytics events. You can change
+            analytics preferences at any time. Please do not submit sensitive
+            data in Contact or EM AI.
+          </div>
         </div>
         <ContactForm />
       </div>

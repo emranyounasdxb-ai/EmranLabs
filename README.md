@@ -160,3 +160,129 @@ Do not use cPanel “Deploy HEAD Commit”. Do not use “Ensure Dependencies”
 - Enabled the Creative Labs desktop application as a set of exploration themes and concept directions, with in-window detail views for focus areas, methods, and key exploration questions.
 - Professional Journey and Creative Labs are available through the desktop registry, desktop icons, dock, and Command Center application results.
 - EM AI remained visible but disabled until Step 7.
+
+## Step 8 status — final launch polish
+
+Step 8 completes the final production-review polish for SEO, accessibility, analytics, security headers, error states, and launch operations while preserving the desktop architecture, selective 3D safeguards, EM AI server route, secure Contact server route, and cPanel Passenger deployment model.
+
+### Current desktop applications
+
+- About Identity
+- Skills
+- Portfolio Projects
+- Creative Labs
+- Professional Journey
+- Contact
+- EM AI
+
+### SEO, social sharing, and structured data
+
+The App Router metadata now uses `NEXT_PUBLIC_SITE_URL` as the canonical origin, with `https://emranlabs.com` as the production fallback. The public sitemap contains the portfolio homepage only, API routes are excluded from robots indexing, Open Graph and Twitter image routes generate branded EMRAN LABS social cards, and JSON-LD is limited to the confirmed website/profile/person/project-list content.
+
+### EM AI scope
+
+EM AI is a portfolio-grounded assistant for concise questions about confirmed EMRAN LABS content, projects, skills, and professional direction. It is not a general chatbot, does not run OpenAI code in the browser, and returns a safe unavailable state when required server variables are missing.
+
+### Contact delivery architecture
+
+The Contact application submits bounded validated JSON to the server route. Delivery uses the configured SMTP mailbox only when the server-only SMTP variables are present. Users are warned not to submit passwords, API keys, financial details, medical information, or other sensitive data.
+
+### Optional analytics configuration
+
+Optional Google Analytics is enabled only through Google Tag Manager after a visitor allows analytics. Use one public variable:
+
+- `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID`
+
+The implementation stores only the local consent choice (`granted` or `denied`) and emits predefined non-sensitive product events after consent. It never sends AI message bodies, AI responses, contact names, contact email addresses, companies, subjects, messages, SMTP data, OpenAI request content, or full conversation history.
+
+### Google Tag Manager and Google Analytics 4 setup
+
+A. Google Analytics:
+
+- Create or select the EMRAN LABS GA4 property.
+- Create the web data stream for `https://emranlabs.com`.
+- Copy the Measurement ID that begins with `G-`. Do not commit it to source code.
+
+B. Google Tag Manager:
+
+- Create or select the EMRAN LABS Web container.
+- Copy the container ID that begins with `GTM-`.
+- Add the GTM container ID to cPanel Application Manager as `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID=GTM-...`.
+- Rebuild and deploy after changing this `NEXT_PUBLIC` variable.
+
+C. Inside GTM:
+
+- Create a Google Tag.
+- Enter the GA4 Tag ID / Measurement ID beginning with `G-`.
+- Use the appropriate initialization/all-pages trigger.
+- Configure consent requirements so analytics tags require `analytics_storage`.
+- Create GA4 event handling for approved custom event names: `application_opened`, `project_detail_opened`, `command_center_opened`, `contact_form_submitted`, and `em_ai_opened`.
+- Verify with Tag Assistant Preview.
+- Publish the GTM container only after successful verification.
+
+D. Verification:
+
+- Confirm GTM in Tag Assistant.
+- Confirm the GA4 Realtime report receives a visit after consent.
+- Confirm no analytics request occurs after Decline.
+- Confirm no duplicate `page_view` events.
+- Confirm custom event names appear only after consent.
+
+### Required environment variables
+
+Public:
+
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID`
+
+Server-only:
+
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- `CONTACT_SMTP_HOST`
+- `CONTACT_SMTP_PORT`
+- `CONTACT_SMTP_SECURE`
+- `CONTACT_SMTP_USER`
+- `CONTACT_SMTP_PASSWORD`
+- `CONTACT_TO_EMAIL`
+- `CONTACT_FROM_EMAIL`
+- `CONTACT_REPLY_NAME`
+- `AI_RATE_LIMIT_MAX`
+- `AI_RATE_LIMIT_WINDOW_MS`
+- `CONTACT_RATE_LIMIT_MAX`
+- `CONTACT_RATE_LIMIT_WINDOW_MS`
+
+### Production deployment workflow
+
+Real production deployment is performed on the server with:
+
+```bash
+cd /home/emranlabs/repositories/EmranLabs
+bash scripts/deploy-cpanel.sh
+```
+
+Do not use cPanel “Deploy HEAD Commit”. Do not use “Ensure Dependencies”. Do not run `npm install`. Do not use PM2. Do not copy source into `public_html`. Passenger uses `app.js`; runtime variables are configured in cPanel Application Manager. `scripts/deploy-cpanel.sh` performs the safe pull, low-memory pnpm install, webpack build, atomic build swap, and Passenger restart. Deployment stops when the working tree contains local changes.
+
+### Production smoke-test checklist
+
+- DNS resolves to the canonical HTTPS domain.
+- `NEXT_PUBLIC_SITE_URL` matches the canonical production origin.
+- OpenAI and SMTP variables are configured or unavailable states are accepted.
+- Optional analytics is either disabled or configured with a valid Google Tag Manager container ID and visitor consent.
+- `/robots.txt`, `/sitemap.xml`, `/manifest.webmanifest`, `/opengraph-image`, `/twitter-image`, and `/favicon.ico` respond successfully.
+- Desktop smoke test covers About, Skills, Projects, Creative Labs, Journey, Contact, EM AI, Dock, Command Center, window open/focus/move/minimize/restore/close, and no console hydration errors.
+- Mobile smoke test covers 390px, 430px, 768px, 1024px, and 1440px widths where practical.
+- Keyboard test covers skip link, desktop icons, dock, Command Center, window controls, Contact form, and EM AI composer/actions.
+- Contact delivery test confirms success and missing-service fallback.
+- EM AI test confirms success and missing-service fallback.
+- Rate-limit test confirms generic public responses and `Retry-After` behavior.
+- Server logs contain no message bodies, secrets, provider details, or model output.
+- Rollback readiness is confirmed before deployment.
+
+### Rollback notes
+
+If production smoke tests fail after deployment, restore the previous known-good repository commit and rerun `bash scripts/deploy-cpanel.sh`. Keep the previous `.next` backup generated by the deployment workflow until the new release is verified.
+
+### Security limitations and future hardening
+
+Current hardening includes safe browser headers, same-origin and Fetch Metadata request guards, bounded payloads, rate limiting, generic public API errors, server-only OpenAI/SMTP integrations, consent-aware optional Google Tag Manager loading, and no committed secrets. A strict Content Security Policy is intentionally deferred until it can be fully tested with Next.js runtime scripts, optional analytics, fonts, and WebGL without breaking the desktop experience.
