@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "validate:jsonld": "node scripts/validate-jsonld.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.4.0",
