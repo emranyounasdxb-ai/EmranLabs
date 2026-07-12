@@ -30,6 +30,21 @@ About Identity, Skills, Portfolio Projects, and Contact are polished application
 
 Selective 3D experiences, cinematic motion, and EM AI functionality continue through later implementation steps.
 
+## Step 9 production tools guide
+
+Search visibility, monitoring, and observability setup is documented in [docs/production-tools-setup.md](docs/production-tools-setup.md). The guide separates application code from environment configuration, GTM configuration, DNS verification, and external dashboard work for GA4, GTM, Search Console, Clarity, Cloudflare, Bing Webmaster Tools, Sentry, UptimeRobot, Ahrefs Webmaster Tools, and JSON-LD.
+
+Final operations checklist before production enablement:
+
+- Configure GA4 only inside the consent-gated GTM container; do not add a direct GA loader.
+- Verify Google Search Console primarily with Cloudflare DNS TXT and submit `https://emranlabs.com/sitemap.xml`.
+- Configure Microsoft Clarity through GTM after analytics consent with sensitive masking.
+- Manually verify Cloudflare SSL, proxy, cache, redirect, and mail-DNS behavior.
+- Configure Bing Webmaster Tools and Ahrefs externally without application credentials.
+- Configure Sentry with `NEXT_PUBLIC_SENTRY_DSN` and keep source-map upload credentials server/build-only.
+- Configure UptimeRobot to monitor `https://emranlabs.com/api/health`.
+- Validate JSON-LD with automated checks and external validators; rich results are not guaranteed.
+
 ## Technology foundation
 
 - Next.js App Router

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { ConsentAwareGtm } from "@/components/analytics/consent-aware-gtm";
+import { PortfolioJsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/config/site";
+import { getSiteVerification } from "@/lib/metadata/site-verification";
 
 import "./globals.css";
 
@@ -12,6 +15,7 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   applicationName: siteConfig.name,
   authors: [{ name: siteConfig.brandName }],
+  verification: getSiteVerification(),
 };
 
 export default function RootLayout({
@@ -21,7 +25,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <PortfolioJsonLd />
+        <ConsentAwareGtm />
+      </body>
     </html>
   );
 }

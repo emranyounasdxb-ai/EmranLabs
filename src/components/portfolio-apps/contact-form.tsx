@@ -105,6 +105,7 @@ export function ContactForm() {
     <form
       onSubmit={submit}
       className="space-y-4 rounded-[var(--radius-panel)] border border-[var(--glass-border)] bg-white/[0.035] p-5"
+      data-clarity-mask="true"
       noValidate
     >
       <div>

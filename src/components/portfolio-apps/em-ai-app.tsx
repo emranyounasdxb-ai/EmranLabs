@@ -141,6 +141,7 @@ export function EmAiApp() {
         role="log"
         aria-live="polite"
         aria-relevant="additions text"
+        data-clarity-mask="true"
         className="min-h-0 flex-1 space-y-3 overflow-y-auto rounded-2xl border border-[var(--glass-border)] bg-black/10 p-3"
       >
         {messages.length === 0 && (
@@ -166,6 +167,7 @@ export function EmAiApp() {
           void send();
         }}
         className="space-y-2"
+        data-clarity-mask="true"
       >
         <label
           htmlFor="em-ai-composer"
