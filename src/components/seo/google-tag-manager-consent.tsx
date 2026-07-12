@@ -3,35 +3,42 @@
 import { useEffect, useRef, useState } from "react";
 import type { AnalyticsConfig } from "@/lib/analytics/config";
 import {
-  disableGoogleTagManagerEvents,
   doNotTrackEnabled,
+  getGoogleTagManagerStatus,
   getStoredAnalyticsConsent,
-  markGoogleTagManagerLoading,
   pushConsentDefault,
   pushConsentUpdate,
+  queueGoogleTagManagerStart,
+  setGoogleTagManagerStatus,
   storeAnalyticsConsent,
   type AnalyticsConsent,
 } from "@/lib/analytics/client";
 
 const gtmOrigin = "https://www.googletagmanager.com";
+const gtmScriptId = "emranlabs-google-tag-manager";
 
 type ConsentView = "banner" | "preferences" | "collapsed";
 
 function loadGoogleTagManager(containerId: string) {
-  if (!markGoogleTagManagerLoading()) return;
-  const existing = document.getElementById("emranlabs-google-tag-manager");
-  if (existing) return;
+  const status = getGoogleTagManagerStatus();
+  if (status === "loading" || status === "loaded") return;
+
+  const existing = document.getElementById(gtmScriptId);
+  if (existing) {
+    setGoogleTagManagerStatus("loading");
+    return;
+  }
+
+  queueGoogleTagManagerStart();
+  setGoogleTagManagerStatus("loading");
 
   const script = document.createElement("script");
-  script.id = "emranlabs-google-tag-manager";
+  script.id = gtmScriptId;
   script.async = true;
   script.src = `${gtmOrigin}/gtm.js?id=${encodeURIComponent(containerId)}`;
+  script.onload = () => setGoogleTagManagerStatus("loaded");
+  script.onerror = () => setGoogleTagManagerStatus("failed");
   document.head.append(script);
-}
-
-function removeGoogleTagManager() {
-  document.getElementById("emranlabs-google-tag-manager")?.remove();
-  disableGoogleTagManagerEvents();
 }
 
 export function GoogleTagManagerConsent({
@@ -39,27 +46,36 @@ export function GoogleTagManagerConsent({
 }: {
   config: AnalyticsConfig;
 }) {
-  const [consent, setConsent] = useState<AnalyticsConsent | null>(() =>
-    typeof window === "undefined" ? null : getStoredAnalyticsConsent(),
-  );
-  const [view, setView] = useState<ConsentView>(() =>
-    typeof window === "undefined" || getStoredAnalyticsConsent()
-      ? "collapsed"
-      : "banner",
-  );
-  const [dnt] = useState(() =>
-    typeof navigator === "undefined" ? false : doNotTrackEnabled(),
-  );
+  const [hydrated, setHydrated] = useState(false);
+  const [consent, setConsent] = useState<AnalyticsConsent | null>(null);
+  const [view, setView] = useState<ConsentView>("collapsed");
+  const [dnt, setDnt] = useState(false);
+  const preferencesButtonRef = useRef<HTMLButtonElement>(null);
   const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-    pushConsentDefault(dnt ? "denied" : (consent ?? "denied"));
-    if (!dnt && consent === "granted") {
-      loadGoogleTagManager(config.containerId);
-    }
-  }, [config.containerId, consent, dnt]);
+    const timer = window.setTimeout(() => {
+      const storedConsent = getStoredAnalyticsConsent();
+      const dntEnabled = doNotTrackEnabled();
+      setConsent(storedConsent);
+      setDnt(dntEnabled);
+      setView(storedConsent ? "collapsed" : "banner");
+      setHydrated(true);
+
+      if (initialized.current) return;
+      initialized.current = true;
+      pushConsentDefault(dntEnabled ? "denied" : (storedConsent ?? "denied"));
+      if (!dntEnabled && storedConsent === "granted") {
+        loadGoogleTagManager(config.containerId);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [config.containerId]);
+
+  function focusPreferencesButton() {
+    window.setTimeout(() => preferencesButtonRef.current?.focus(), 0);
+  }
 
   function choose(nextConsent: AnalyticsConsent) {
     storeAnalyticsConsent(nextConsent);
@@ -69,22 +85,25 @@ export function GoogleTagManagerConsent({
     pushConsentUpdate(effectiveConsent);
     if (effectiveConsent === "granted")
       loadGoogleTagManager(config.containerId);
-    else removeGoogleTagManager();
+    focusPreferencesButton();
   }
 
+  if (!hydrated) return null;
+
   const panelVisible = view === "banner" || view === "preferences";
+  const headingId = "analytics-consent-title";
 
   return (
     <div className="pointer-events-none fixed right-3 bottom-24 left-3 z-[520] flex justify-center sm:right-5 sm:bottom-24 sm:left-auto sm:justify-end">
       {panelVisible ? (
         <section
           role={view === "banner" ? "region" : "dialog"}
-          aria-modal="false"
-          aria-labelledby="analytics-consent-title"
+          {...(view === "preferences" ? { "aria-modal": false } : {})}
+          aria-labelledby={headingId}
           className="pointer-events-auto w-full max-w-md rounded-[1.5rem] border border-[var(--glass-border)] bg-[rgba(11,12,16,0.94)] p-4 text-sm text-[var(--text-secondary)] shadow-[var(--shadow-panel)] backdrop-blur-xl"
         >
           <h2
-            id="analytics-consent-title"
+            id={headingId}
             className="font-heading text-base font-semibold text-[var(--text-primary)]"
           >
             Analytics preferences
@@ -120,6 +139,7 @@ export function GoogleTagManagerConsent({
         </section>
       ) : (
         <button
+          ref={preferencesButtonRef}
           type="button"
           onClick={() => setView("preferences")}
           className="pointer-events-auto rounded-full border border-[var(--glass-border)] bg-[rgba(11,12,16,0.82)] px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-[var(--shadow-panel)] backdrop-blur-xl transition hover:text-[var(--text-primary)]"

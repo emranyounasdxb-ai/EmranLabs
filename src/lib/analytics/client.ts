@@ -3,6 +3,7 @@
 export const analyticsConsentStorageKey = "emranlabs.analytics-consent";
 
 export type AnalyticsConsent = "granted" | "denied";
+export type GoogleTagManagerStatus = "idle" | "loading" | "loaded" | "failed";
 
 export type AnalyticsEventName =
   | "application_opened"
@@ -30,14 +31,14 @@ type ConsentModeState = {
   ad_personalization: "denied";
 };
 
-type DataLayerArguments =
-  | ["consent", "default" | "update", ConsentModeState]
+type GtagConsentArguments = IArguments;
+type DataLayerEvent =
   | { "gtm.start": number; event: "gtm.js" }
   | ({ event: AnalyticsEventName } & AnalyticsMetadata);
 
 type AnalyticsWindow = Window & {
-  dataLayer?: DataLayerArguments[];
-  __emranLabsGtmLoaded?: boolean;
+  dataLayer?: Array<GtagConsentArguments | DataLayerEvent>;
+  __emranLabsGtmStatus?: GoogleTagManagerStatus;
 };
 
 export function doNotTrackEnabled() {
@@ -73,15 +74,32 @@ export function buildConsentState(
   };
 }
 
-function getDataLayer() {
-  const analyticsWindow = window as AnalyticsWindow;
+function getAnalyticsWindow() {
+  return window as AnalyticsWindow;
+}
+
+export function getDataLayer() {
+  const analyticsWindow = getAnalyticsWindow();
   analyticsWindow.dataLayer = analyticsWindow.dataLayer ?? [];
   return analyticsWindow.dataLayer;
 }
 
+function gtagCommand(
+  command: "consent",
+  action: "default" | "update",
+  state: ConsentModeState,
+) {
+  void command;
+  void action;
+  void state;
+  // Match Google's documented fallback shape: function gtag(){dataLayer.push(arguments);}
+  // eslint-disable-next-line prefer-rest-params
+  getDataLayer().push(arguments);
+}
+
 export function pushConsentDefault(consent: AnalyticsConsent) {
   try {
-    getDataLayer().push(["consent", "default", buildConsentState(consent)]);
+    gtagCommand("consent", "default", buildConsentState(consent));
   } catch {
     // Consent mode must never affect the portfolio UI.
   }
@@ -89,27 +107,27 @@ export function pushConsentDefault(consent: AnalyticsConsent) {
 
 export function pushConsentUpdate(consent: AnalyticsConsent) {
   try {
-    getDataLayer().push(["consent", "update", buildConsentState(consent)]);
+    gtagCommand("consent", "update", buildConsentState(consent));
   } catch {
     // Consent mode must never affect the portfolio UI.
   }
 }
 
-export function markGoogleTagManagerLoading() {
+export function getGoogleTagManagerStatus() {
+  return getAnalyticsWindow().__emranLabsGtmStatus ?? "idle";
+}
+
+export function setGoogleTagManagerStatus(status: GoogleTagManagerStatus) {
   try {
-    const analyticsWindow = window as AnalyticsWindow;
-    if (analyticsWindow.__emranLabsGtmLoaded) return false;
-    analyticsWindow.__emranLabsGtmLoaded = true;
-    getDataLayer().push({ "gtm.start": Date.now(), event: "gtm.js" });
-    return true;
+    getAnalyticsWindow().__emranLabsGtmStatus = status;
   } catch {
-    return false;
+    // Analytics must never affect the portfolio UI.
   }
 }
 
-export function disableGoogleTagManagerEvents() {
+export function queueGoogleTagManagerStart() {
   try {
-    (window as AnalyticsWindow).__emranLabsGtmLoaded = false;
+    getDataLayer().push({ "gtm.start": Date.now(), event: "gtm.js" });
   } catch {
     // Analytics must never affect the portfolio UI.
   }
@@ -120,11 +138,11 @@ export function trackEvent(
   metadata?: AnalyticsMetadata,
 ) {
   try {
-    const analyticsWindow = window as AnalyticsWindow;
+    const analyticsWindow = getAnalyticsWindow();
     if (
       doNotTrackEnabled() ||
       getStoredAnalyticsConsent() !== "granted" ||
-      !analyticsWindow.__emranLabsGtmLoaded ||
+      analyticsWindow.__emranLabsGtmStatus !== "loaded" ||
       !analyticsWindow.dataLayer
     ) {
       return;
