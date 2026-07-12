@@ -19,6 +19,9 @@ export function DesktopShell() {
 
   return (
     <DesktopMotionProvider>
+      <a href="#desktop-main" className="skip-link">
+        Skip to desktop applications
+      </a>
       <div
         ref={shellRef}
         className="relative min-h-screen overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)] [--desktop-depth-x:0px] [--desktop-depth-y:0px]"

@@ -2,10 +2,9 @@
 @import "../styles/tokens.css";
 
 :root {
-  --font-space-grotesk: "Space Grotesk", "Segoe UI", Arial, sans-serif;
+  --font-space-grotesk: var(--font-body), "Segoe UI", Arial, sans-serif;
   --font-jetbrains-mono:
-    "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  --font-body: Arial, Helvetica, sans-serif;
+    var(--font-mono), "SFMono-Regular", Consolas, monospace;
 }
 
 @theme inline {
@@ -31,6 +30,7 @@ html {
 
 body {
   min-height: 100vh;
+  overflow-x: hidden;
   margin: 0;
   background: var(--background-primary);
   color: var(--text-primary);
@@ -138,5 +138,29 @@ body {
   }
   to {
     background-position-y: 9rem;
+  }
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 999;
+  transform: translateY(-160%);
+  border-radius: 999px;
+  background: var(--color-signal);
+  color: #020304;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+@media (max-width: 767px) {
+  .desktop-atmosphere {
+    filter: blur(3px);
+  }
+  .desktop-scanline {
+    display: none;
   }
 }

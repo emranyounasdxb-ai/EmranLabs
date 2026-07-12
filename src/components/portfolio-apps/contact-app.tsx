@@ -72,6 +72,13 @@ export function ContactApp() {
             channels remain available if the form service is temporarily
             unavailable.
           </div>
+          <div className="rounded-2xl border border-[var(--glass-border)] bg-white/[0.035] p-4 text-xs leading-5 text-[var(--text-secondary)]">
+            Privacy note: optional privacy-respecting analytics may record only
+            non-sensitive product interactions when configured. Contact
+            inquiries are delivered to the configured mailbox. EM AI
+            conversations are processed to generate a response. Please do not
+            submit sensitive information.
+          </div>
         </div>
         <ContactForm />
       </div>

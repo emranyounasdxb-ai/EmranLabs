@@ -4,6 +4,7 @@ import { cloneElement, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { contactInquiryTypes, type ContactFormValues } from "@/types/contact";
 import type { ApiErrorResponse } from "@/types/em-ai";
+import { trackEvent } from "@/lib/analytics/client";
 
 const CONTACT_STATUS_ID = "contact-status";
 
@@ -81,6 +82,7 @@ export function ContactForm() {
       if (data.ok) {
         setStatus(data.message);
         setValues(initial());
+        trackEvent("contact_form_submitted");
       } else {
         const nextErrors = data.fieldErrors ?? {};
         setStatus(mapContactMessage(data));
