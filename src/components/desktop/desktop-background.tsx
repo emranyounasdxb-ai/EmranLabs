@@ -39,7 +39,7 @@ function StaticCinematicWorld() {
         <div className="absolute inset-[-34%] rotate-[-26deg] rounded-full border border-[rgba(112,160,197,0.045)]" />
       </div>
       <div className="absolute top-[22%] left-[12%] h-64 w-[38vw] rotate-[-14deg] bg-[radial-gradient(ellipse,rgba(33,142,139,0.12),transparent_66%)] blur-2xl" />
-      <div className="absolute inset-0 opacity-35 [background-image:radial-gradient(rgba(159,213,235,0.55)_0.65px,transparent_0.65px)] [background-size:42px_42px]" />
+      <div className="absolute inset-0 [background-image:radial-gradient(rgba(159,213,235,0.55)_0.65px,transparent_0.65px)] [background-size:42px_42px] opacity-35" />
     </div>
   );
 }

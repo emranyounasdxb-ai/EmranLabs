@@ -3,7 +3,7 @@
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import type { ComponentProps } from "react";
 import { memo, Suspense, useEffect, useMemo, useRef } from "react";
-import type { Group, Mesh, Points } from "three";
+import type { Group, Mesh, Points, Texture } from "three";
 import {
   ACESFilmicToneMapping,
   AdditiveBlending,
@@ -16,6 +16,7 @@ import {
   SRGBColorSpace,
   TextureLoader,
   Vector2,
+  Vector3,
 } from "three";
 
 import { useDocumentVisibility } from "@/hooks/use-document-visibility";
@@ -97,9 +98,21 @@ function CameraRig({ active }: { active: boolean }) {
     const targetY = pointer.y * 0.14 + Math.cos(elapsed * 0.11) * 0.04;
     const targetZ = 6.25 + Math.sin(elapsed * 0.09) * 0.07;
 
-    camera.position.x = MathUtils.lerp(camera.position.x, targetX, damping * 0.09);
-    camera.position.y = MathUtils.lerp(camera.position.y, targetY, damping * 0.09);
-    camera.position.z = MathUtils.lerp(camera.position.z, targetZ, damping * 0.07);
+    camera.position.x = MathUtils.lerp(
+      camera.position.x,
+      targetX,
+      damping * 0.09,
+    );
+    camera.position.y = MathUtils.lerp(
+      camera.position.y,
+      targetY,
+      damping * 0.09,
+    );
+    camera.position.z = MathUtils.lerp(
+      camera.position.z,
+      targetZ,
+      damping * 0.07,
+    );
     camera.lookAt(0.32 + pointer.x * 0.045, pointer.y * 0.025, 0);
   });
 
@@ -134,7 +147,11 @@ function NebulaField({ active }: { active: boolean }) {
 
   return (
     <group ref={groupRef} position={[0, 0, -4.5]}>
-      <mesh position={[-2.8, 1.15, 0]} rotation={[0, 0, -0.18]} scale={[5.4, 3.3, 1]}>
+      <mesh
+        position={[-2.8, 1.15, 0]}
+        rotation={[0, 0, -0.18]}
+        scale={[5.4, 3.3, 1]}
+      >
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial
           map={cyanTexture}
@@ -145,7 +162,11 @@ function NebulaField({ active }: { active: boolean }) {
           toneMapped={false}
         />
       </mesh>
-      <mesh position={[2.45, 1.1, -0.5]} rotation={[0, 0, 0.22]} scale={[4.8, 3.4, 1]}>
+      <mesh
+        position={[2.45, 1.1, -0.5]}
+        rotation={[0, 0, 0.22]}
+        scale={[4.8, 3.4, 1]}
+      >
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial
           map={violetTexture}
@@ -156,7 +177,11 @@ function NebulaField({ active }: { active: boolean }) {
           toneMapped={false}
         />
       </mesh>
-      <mesh position={[0.3, -2.2, -0.8]} rotation={[0, 0, -0.08]} scale={[6.8, 2.8, 1]}>
+      <mesh
+        position={[0.3, -2.2, -0.8]}
+        rotation={[0, 0, -0.08]}
+        scale={[6.8, 2.8, 1]}
+      >
         <planeGeometry args={[1, 1]} />
         <meshBasicMaterial
           map={cyanTexture}
@@ -223,11 +248,13 @@ function SpaceParticles({ active }: { active: boolean }) {
     if (!active) return;
     if (farRef.current) {
       farRef.current.rotation.y -= delta * 0.004;
-      farRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.05) * 0.015;
+      farRef.current.rotation.x =
+        Math.sin(clock.getElapsedTime() * 0.05) * 0.015;
     }
     if (nearRef.current) {
       nearRef.current.rotation.y += delta * 0.008;
-      nearRef.current.position.y = Math.sin(clock.getElapsedTime() * 0.08) * 0.04;
+      nearRef.current.position.y =
+        Math.sin(clock.getElapsedTime() * 0.08) * 0.04;
     }
   });
 
@@ -235,8 +262,14 @@ function SpaceParticles({ active }: { active: boolean }) {
     <>
       <points ref={farRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[farParticles.positions, 3]} />
-          <bufferAttribute attach="attributes-color" args={[farParticles.colors, 3]} />
+          <bufferAttribute
+            attach="attributes-position"
+            args={[farParticles.positions, 3]}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            args={[farParticles.colors, 3]}
+          />
         </bufferGeometry>
         <pointsMaterial
           size={0.018}
@@ -251,8 +284,14 @@ function SpaceParticles({ active }: { active: boolean }) {
       </points>
       <points ref={nearRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[nearParticles.positions, 3]} />
-          <bufferAttribute attach="attributes-color" args={[nearParticles.colors, 3]} />
+          <bufferAttribute
+            attach="attributes-position"
+            args={[nearParticles.positions, 3]}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            args={[nearParticles.colors, 3]}
+          />
         </bufferGeometry>
         <pointsMaterial
           size={0.032}
@@ -280,7 +319,11 @@ function HolographicDepth({ active }: { active: boolean }) {
   });
 
   return (
-    <group ref={groupRef} position={[-1.4, -0.35, -2.1]} rotation={[0.12, -0.18, -0.4]}>
+    <group
+      ref={groupRef}
+      position={[-1.4, -0.35, -2.1]}
+      rotation={[0.12, -0.18, -0.4]}
+    >
       {[0, 1, 2].map((index) => (
         <mesh
           key={index}
@@ -335,7 +378,11 @@ function SolarPanel({ side }: { side: -1 | 1 }) {
     <group position={[side * 0.47, 0, 0]}>
       <mesh position={[side * -0.255, 0, 0]} castShadow>
         <boxGeometry args={[0.17, 0.018, 0.024]} />
-        <meshStandardMaterial color="#707980" metalness={0.88} roughness={0.28} />
+        <meshStandardMaterial
+          color="#707980"
+          metalness={0.88}
+          roughness={0.28}
+        />
       </mesh>
       <mesh castShadow receiveShadow>
         <boxGeometry args={[0.54, 0.018, 0.25]} />
@@ -361,13 +408,21 @@ function SolarPanel({ side }: { side: -1 | 1 }) {
       {verticalDividers.map((offset) => (
         <mesh key={offset} position={[offset, 0.017, 0]}>
           <boxGeometry args={[0.005, 0.005, 0.224]} />
-          <meshStandardMaterial color="#85919b" metalness={0.9} roughness={0.24} />
+          <meshStandardMaterial
+            color="#85919b"
+            metalness={0.9}
+            roughness={0.24}
+          />
         </mesh>
       ))}
       {horizontalDividers.map((offset) => (
         <mesh key={offset} position={[0, 0.017, offset]}>
           <boxGeometry args={[0.51, 0.005, 0.005]} />
-          <meshStandardMaterial color="#7e8b96" metalness={0.9} roughness={0.24} />
+          <meshStandardMaterial
+            color="#7e8b96"
+            metalness={0.9}
+            roughness={0.24}
+          />
         </mesh>
       ))}
     </group>
@@ -389,21 +444,35 @@ function SatelliteModel() {
       </mesh>
       <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.132, 0.132, 0.075, 32]} />
-        <meshStandardMaterial color="#171c22" metalness={0.92} roughness={0.22} />
+        <meshStandardMaterial
+          color="#171c22"
+          metalness={0.92}
+          roughness={0.22}
+        />
       </mesh>
       <mesh position={[-0.2, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.082, 0.096, 0.13, 24]} />
-        <meshStandardMaterial color="#aab1b8" metalness={0.9} roughness={0.26} />
+        <meshStandardMaterial
+          color="#aab1b8"
+          metalness={0.9}
+          roughness={0.26}
+        />
       </mesh>
       <mesh position={[0.21, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.09, 0.106, 0.14, 24]} />
-        <meshStandardMaterial color="#252b31" metalness={0.9} roughness={0.25} />
+        <meshStandardMaterial
+          color="#252b31"
+          metalness={0.9}
+          roughness={0.25}
+        />
       </mesh>
       <SolarPanel side={-1} />
       <SolarPanel side={1} />
       <group position={[0.235, 0.015, 0]} rotation={[0, 0, -Math.PI / 2]}>
         <mesh castShadow>
-          <sphereGeometry args={[0.145, 30, 18, 0, Math.PI * 2, 0, Math.PI / 2.08]} />
+          <sphereGeometry
+            args={[0.145, 30, 18, 0, Math.PI * 2, 0, Math.PI / 2.08]}
+          />
           <meshPhysicalMaterial
             color="#bfc6cc"
             metalness={0.86}
@@ -414,11 +483,19 @@ function SatelliteModel() {
         </mesh>
         <mesh position={[0, 0.105, 0]}>
           <cylinderGeometry args={[0.007, 0.007, 0.18, 12]} />
-          <meshStandardMaterial color="#667079" metalness={0.92} roughness={0.2} />
+          <meshStandardMaterial
+            color="#667079"
+            metalness={0.92}
+            roughness={0.2}
+          />
         </mesh>
         <mesh position={[0, 0.205, 0]}>
           <sphereGeometry args={[0.022, 14, 10]} />
-          <meshStandardMaterial color="#dce1e5" metalness={0.88} roughness={0.18} />
+          <meshStandardMaterial
+            color="#dce1e5"
+            metalness={0.88}
+            roughness={0.18}
+          />
         </mesh>
       </group>
       <mesh position={[-0.245, 0.052, 0]}>
@@ -429,7 +506,13 @@ function SatelliteModel() {
   );
 }
 
-function OrbitingSatellite({ active, config }: { active: boolean; config: OrbitConfig }) {
+function OrbitingSatellite({
+  active,
+  config,
+}: {
+  active: boolean;
+  config: OrbitConfig;
+}) {
   const satelliteRef = useRef<Group>(null);
 
   useFrame(({ clock }) => {
@@ -505,14 +588,14 @@ function EarthSurface({
   dayTexture,
   nightTexture,
 }: {
-  dayTexture: ReturnType<typeof useLoader<TextureLoader>>[number];
-  nightTexture: ReturnType<typeof useLoader<TextureLoader>>[number];
+  dayTexture: Texture;
+  nightTexture: Texture;
 }) {
   const uniforms = useMemo(
     () => ({
       dayTexture: { value: dayTexture },
       nightTexture: { value: nightTexture },
-      sunDirection: { value: [0.8, 0.34, 0.52] },
+      sunDirection: { value: new Vector3(0.8, 0.34, 0.52) },
     }),
     [dayTexture, nightTexture],
   );
@@ -564,7 +647,11 @@ function LoadingWorld() {
     <group position={[2.05, 0.18, -0.25]}>
       <mesh>
         <sphereGeometry args={[0.9, 48, 48]} />
-        <meshStandardMaterial color="#07101a" roughness={0.76} metalness={0.08} />
+        <meshStandardMaterial
+          color="#07101a"
+          roughness={0.76}
+          metalness={0.08}
+        />
       </mesh>
       <Atmosphere />
     </group>
@@ -592,7 +679,12 @@ function EarthSystem({ active }: { active: boolean }) {
     nightTexture.colorSpace = SRGBColorSpace;
     cloudsTexture.colorSpace = SRGBColorSpace;
 
-    for (const texture of [dayTexture, normalTexture, nightTexture, cloudsTexture]) {
+    for (const texture of [
+      dayTexture,
+      normalTexture,
+      nightTexture,
+      cloudsTexture,
+    ]) {
       texture.wrapS = RepeatWrapping;
       texture.anisotropy = anisotropy;
       texture.needsUpdate = true;
@@ -687,10 +779,29 @@ function WorldScene({ active }: { active: boolean }) {
 
       <ambientLight intensity={0.08} />
       <hemisphereLight args={["#8cb9d2", "#010308", 0.24]} />
-      <directionalLight position={[4.6, 3.5, 5.4]} color="#f5fbff" intensity={2.2} castShadow />
-      <directionalLight position={[-3.4, -1.8, 2.1]} color="#275b7f" intensity={0.38} />
-      <pointLight position={[1.2, 0.8, 1.4]} color="#61cfe4" intensity={0.72} distance={7} />
-      <pointLight position={[-2.8, 1.7, -1.8]} color="#7258c8" intensity={0.42} distance={8} />
+      <directionalLight
+        position={[4.6, 3.5, 5.4]}
+        color="#f5fbff"
+        intensity={2.2}
+        castShadow
+      />
+      <directionalLight
+        position={[-3.4, -1.8, 2.1]}
+        color="#275b7f"
+        intensity={0.38}
+      />
+      <pointLight
+        position={[1.2, 0.8, 1.4]}
+        color="#61cfe4"
+        intensity={0.72}
+        distance={7}
+      />
+      <pointLight
+        position={[-2.8, 1.7, -1.8]}
+        color="#7258c8"
+        intensity={0.42}
+        distance={8}
+      />
     </>
   );
 }
