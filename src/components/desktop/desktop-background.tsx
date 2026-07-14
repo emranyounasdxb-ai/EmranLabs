@@ -71,6 +71,14 @@ export function DesktopBackground() {
         </video>
       )}
 
+      {canPlayVideo && videoReady && (
+        <>
+          <div className="absolute inset-0 bg-white/[0.025] backdrop-blur-[1.5px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.012)_34%,rgba(255,255,255,0.025)_100%)]" />
+          <div className="absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_0_90px_rgba(255,255,255,0.015)]" />
+        </>
+      )}
+
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,5,10,0.34),rgba(2,5,10,0.08)_36%,rgba(2,4,9,0.14)_76%,rgba(2,4,10,0.28)),linear-gradient(180deg,rgba(2,4,9,0.08),transparent_48%,rgba(1,3,8,0.42))]" />
       <div className="desktop-grid absolute inset-0 opacity-[0.07]" />
       <div className="desktop-scanline absolute inset-0 opacity-[0.06]" />
