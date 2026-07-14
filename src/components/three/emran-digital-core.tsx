@@ -83,7 +83,11 @@ function SolarArray({ side }: { side: -1 | 1 }) {
     <group position={[side * 0.48, 0, 0]}>
       <mesh position={[side * -0.26, 0, 0]} castShadow>
         <boxGeometry args={[0.18, 0.018, 0.022]} />
-        <meshStandardMaterial color="#4d5660" metalness={0.92} roughness={0.25} />
+        <meshStandardMaterial
+          color="#4d5660"
+          metalness={0.92}
+          roughness={0.25}
+        />
       </mesh>
 
       <mesh castShadow receiveShadow>
@@ -112,14 +116,22 @@ function SolarArray({ side }: { side: -1 | 1 }) {
       {verticalDividers.map((offset) => (
         <mesh key={offset} position={[offset, 0.017, 0]}>
           <boxGeometry args={[0.006, 0.006, 0.225]} />
-          <meshStandardMaterial color="#9eabb7" metalness={0.9} roughness={0.22} />
+          <meshStandardMaterial
+            color="#9eabb7"
+            metalness={0.9}
+            roughness={0.22}
+          />
         </mesh>
       ))}
 
       {horizontalDividers.map((offset) => (
         <mesh key={offset} position={[0, 0.017, offset]}>
           <boxGeometry args={[0.51, 0.006, 0.006]} />
-          <meshStandardMaterial color="#8a98a6" metalness={0.9} roughness={0.24} />
+          <meshStandardMaterial
+            color="#8a98a6"
+            metalness={0.9}
+            roughness={0.24}
+          />
         </mesh>
       ))}
     </group>
@@ -130,7 +142,9 @@ function CommunicationsDish() {
   return (
     <group position={[0.24, 0.02, 0]} rotation={[0, 0, -Math.PI / 2]}>
       <mesh castShadow>
-        <sphereGeometry args={[0.16, 32, 20, 0, Math.PI * 2, 0, Math.PI / 2.05]} />
+        <sphereGeometry
+          args={[0.16, 32, 20, 0, Math.PI * 2, 0, Math.PI / 2.05]}
+        />
         <meshPhysicalMaterial
           color="#b7c0c9"
           metalness={0.86}
@@ -142,11 +156,19 @@ function CommunicationsDish() {
       </mesh>
       <mesh position={[0, 0.115, 0]}>
         <cylinderGeometry args={[0.008, 0.008, 0.2, 12]} />
-        <meshStandardMaterial color="#606a74" metalness={0.92} roughness={0.2} />
+        <meshStandardMaterial
+          color="#606a74"
+          metalness={0.92}
+          roughness={0.2}
+        />
       </mesh>
       <mesh position={[0, 0.215, 0]}>
         <sphereGeometry args={[0.026, 16, 12]} />
-        <meshStandardMaterial color="#d8dee4" metalness={0.9} roughness={0.18} />
+        <meshStandardMaterial
+          color="#d8dee4"
+          metalness={0.9}
+          roughness={0.18}
+        />
       </mesh>
     </group>
   );
@@ -175,22 +197,38 @@ function SatelliteModel({ variant }: { variant: OrbitConfig["variant"] }) {
 
       <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.132, 0.132, 0.08, 32]} />
-        <meshStandardMaterial color="#161a1f" metalness={0.94} roughness={0.22} />
+        <meshStandardMaterial
+          color="#161a1f"
+          metalness={0.94}
+          roughness={0.22}
+        />
       </mesh>
 
       <mesh position={[-0.19, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.083, 0.096, 0.12, 24]} />
-        <meshStandardMaterial color="#a7afb8" metalness={0.9} roughness={0.26} />
+        <meshStandardMaterial
+          color="#a7afb8"
+          metalness={0.9}
+          roughness={0.26}
+        />
       </mesh>
 
       <mesh position={[0.19, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.09, 0.105, 0.12, 24]} />
-        <meshStandardMaterial color="#252b31" metalness={0.9} roughness={0.25} />
+        <meshStandardMaterial
+          color="#252b31"
+          metalness={0.9}
+          roughness={0.25}
+        />
       </mesh>
 
       <mesh position={[0, 0.105, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.092, 0.014, 12, 32]} />
-        <meshStandardMaterial color="#b29354" metalness={0.74} roughness={0.42} />
+        <meshStandardMaterial
+          color="#b29354"
+          metalness={0.74}
+          roughness={0.42}
+        />
       </mesh>
 
       <SolarArray side={-1} />
@@ -211,7 +249,11 @@ function SatelliteModel({ variant }: { variant: OrbitConfig["variant"] }) {
           </mesh>
           <mesh position={[0.12, 0, 0]}>
             <sphereGeometry args={[0.055, 20, 14]} />
-            <meshStandardMaterial color="#10151b" metalness={0.72} roughness={0.18} />
+            <meshStandardMaterial
+              color="#10151b"
+              metalness={0.72}
+              roughness={0.18}
+            />
           </mesh>
         </group>
       )}
@@ -311,7 +353,11 @@ function LoadingEarth() {
     <group rotation={[0.08, -0.85, -0.08]}>
       <mesh>
         <sphereGeometry args={[0.92, 48, 48]} />
-        <meshStandardMaterial color="#07111d" metalness={0.12} roughness={0.72} />
+        <meshStandardMaterial
+          color="#07111d"
+          metalness={0.12}
+          roughness={0.72}
+        />
       </mesh>
       <Atmosphere />
     </group>
@@ -325,10 +371,8 @@ function GlobeWorld({ active }: { active: boolean }) {
   const starsRef = useRef<Points>(null);
   const gl = useThree((state) => state.gl);
 
-  const [surfaceTexture, normalTexture, lightsTexture, cloudsTexture] = useLoader(
-    TextureLoader,
-    EARTH_TEXTURES,
-  );
+  const [surfaceTexture, normalTexture, lightsTexture, cloudsTexture] =
+    useLoader(TextureLoader, EARTH_TEXTURES);
 
   const normalScale = useMemo(() => new Vector2(0.56, 0.56), []);
 
