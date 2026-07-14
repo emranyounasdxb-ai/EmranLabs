@@ -1,140 +1,229 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import type { ComponentProps } from "react";
-import { memo, useEffect, useMemo, useRef } from "react";
-import type { Group, Points } from "three";
+import { memo, Suspense, useEffect, useMemo, useRef } from "react";
+import type { Group, Mesh, Points } from "three";
 import {
+  ACESFilmicToneMapping,
   AdditiveBlending,
   BackSide,
   Color,
+  DoubleSide,
   MathUtils,
-  CanvasTexture,
   RepeatWrapping,
   SRGBColorSpace,
+  TextureLoader,
+  Vector2,
 } from "three";
 
-import {
-  WORLD_MAP_CITIES,
-  WORLD_MAP_CONNECTIONS,
-  WORLD_MAP_PATH,
-} from "@/data/world-map-path";
 import { useDocumentVisibility } from "@/hooks/use-document-visibility";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 type OrbitConfig = {
   radius: number;
+  verticalScale: number;
+  depth: number;
   speed: number;
   phase: number;
   inclination: number;
   tilt: number;
   scale: number;
-  accent: string;
+  variant: "communications" | "relay" | "weather";
 };
 
 const ORBITS: OrbitConfig[] = [
   {
-    radius: 1.18,
-    speed: 0.24,
-    phase: 0.25,
-    inclination: 0.48,
-    tilt: 0.1,
-    scale: 0.86,
-    accent: "#56f4dc",
-  },
-  {
     radius: 1.42,
-    speed: -0.18,
-    phase: 2.3,
-    inclination: -0.62,
-    tilt: 0.72,
-    scale: 0.72,
-    accent: "#8a72ff",
+    verticalScale: 0.68,
+    depth: 0.28,
+    speed: 0.11,
+    phase: 2.5,
+    inclination: 0.5,
+    tilt: 0.12,
+    scale: 0.74,
+    variant: "communications",
   },
   {
-    radius: 1.66,
-    speed: 0.12,
-    phase: 4.35,
-    inclination: 0.2,
-    tilt: -0.54,
-    scale: 0.64,
-    accent: "#4ea8ff",
+    radius: 1.72,
+    verticalScale: 0.74,
+    depth: 0.34,
+    speed: -0.078,
+    phase: 5.2,
+    inclination: -0.45,
+    tilt: 0.7,
+    scale: 0.58,
+    variant: "relay",
+  },
+  {
+    radius: 1.95,
+    verticalScale: 0.64,
+    depth: 0.38,
+    speed: 0.056,
+    phase: 0.72,
+    inclination: 0.18,
+    tilt: -0.5,
+    scale: 0.42,
+    variant: "weather",
   },
 ];
 
-function SatelliteModel({ accent }: { accent: string }) {
-  const panelBars = [-0.12, -0.04, 0.04, 0.12];
+const EARTH_TEXTURES = [
+  "/textures/earth/earth-atmosphere.jpg",
+  "/textures/earth/earth-normal.jpg",
+  "/textures/earth/earth-lights.png",
+  "/textures/earth/earth-clouds.png",
+];
+
+function SolarArray({ side }: { side: -1 | 1 }) {
+  const verticalDividers = [-0.18, -0.09, 0, 0.09, 0.18];
+  const horizontalDividers = [-0.068, 0, 0.068];
 
   return (
-    <group rotation={[0.15, -0.35, 0.08]}>
-      <mesh castShadow>
-        <boxGeometry args={[0.28, 0.2, 0.18]} />
-        <meshStandardMaterial
-          color="#a8b7c7"
-          metalness={0.82}
-          roughness={0.28}
-          emissive={accent}
-          emissiveIntensity={0.08}
+    <group position={[side * 0.48, 0, 0]}>
+      <mesh position={[side * -0.26, 0, 0]} castShadow>
+        <boxGeometry args={[0.18, 0.018, 0.022]} />
+        <meshStandardMaterial color="#4d5660" metalness={0.92} roughness={0.25} />
+      </mesh>
+
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={[0.54, 0.018, 0.25]} />
+        <meshPhysicalMaterial
+          color="#07111d"
+          metalness={0.64}
+          roughness={0.24}
+          clearcoat={0.38}
+          clearcoatRoughness={0.25}
         />
       </mesh>
 
-      <mesh position={[0, 0, 0.15]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.082, 0.082, 0.16, 20]} />
-        <meshStandardMaterial color="#d5dee7" metalness={0.9} roughness={0.2} />
+      <mesh position={[0, 0.011, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.5, 0.215]} />
+        <meshStandardMaterial
+          color="#0d2747"
+          emissive="#06182b"
+          emissiveIntensity={0.18}
+          metalness={0.52}
+          roughness={0.3}
+          side={DoubleSide}
+        />
       </mesh>
 
-      <mesh position={[0, 0.19, 0.03]} rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.105, 0.085, 24, 1, true]} />
-        <meshStandardMaterial
-          color="#cbd5e1"
-          metalness={0.72}
-          roughness={0.3}
+      {verticalDividers.map((offset) => (
+        <mesh key={offset} position={[offset, 0.017, 0]}>
+          <boxGeometry args={[0.006, 0.006, 0.225]} />
+          <meshStandardMaterial color="#9eabb7" metalness={0.9} roughness={0.22} />
+        </mesh>
+      ))}
+
+      {horizontalDividers.map((offset) => (
+        <mesh key={offset} position={[0, 0.017, offset]}>
+          <boxGeometry args={[0.51, 0.006, 0.006]} />
+          <meshStandardMaterial color="#8a98a6" metalness={0.9} roughness={0.24} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function CommunicationsDish() {
+  return (
+    <group position={[0.24, 0.02, 0]} rotation={[0, 0, -Math.PI / 2]}>
+      <mesh castShadow>
+        <sphereGeometry args={[0.16, 32, 20, 0, Math.PI * 2, 0, Math.PI / 2.05]} />
+        <meshPhysicalMaterial
+          color="#b7c0c9"
+          metalness={0.86}
+          roughness={0.24}
+          clearcoat={0.28}
+          clearcoatRoughness={0.3}
           side={BackSide}
         />
       </mesh>
+      <mesh position={[0, 0.115, 0]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.2, 12]} />
+        <meshStandardMaterial color="#606a74" metalness={0.92} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, 0.215, 0]}>
+        <sphereGeometry args={[0.026, 16, 12]} />
+        <meshStandardMaterial color="#d8dee4" metalness={0.9} roughness={0.18} />
+      </mesh>
+    </group>
+  );
+}
 
-      <mesh position={[0, 0.24, 0.03]}>
-        <cylinderGeometry args={[0.012, 0.012, 0.16, 10]} />
-        <meshStandardMaterial
-          color="#e5edf5"
-          metalness={0.9}
-          roughness={0.18}
+function SatelliteModel({ variant }: { variant: OrbitConfig["variant"] }) {
+  const bodyColor =
+    variant === "weather"
+      ? "#6f7781"
+      : variant === "relay"
+        ? "#2d333a"
+        : "#8c7445";
+
+  return (
+    <group rotation={[0.12, -0.3, 0.08]}>
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.105, 0.125, 0.34, 32]} />
+        <meshPhysicalMaterial
+          color={bodyColor}
+          metalness={0.84}
+          roughness={0.34}
+          clearcoat={0.22}
+          clearcoatRoughness={0.42}
         />
       </mesh>
 
-      {[-0.39, 0.39].map((x) => (
-        <group key={x} position={[x, 0, 0]}>
-          <mesh>
-            <boxGeometry args={[0.44, 0.018, 0.23]} />
-            <meshStandardMaterial
-              color="#102e58"
-              emissive="#1b65b3"
-              emissiveIntensity={0.2}
-              metalness={0.62}
-              roughness={0.34}
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.132, 0.132, 0.08, 32]} />
+        <meshStandardMaterial color="#161a1f" metalness={0.94} roughness={0.22} />
+      </mesh>
+
+      <mesh position={[-0.19, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.083, 0.096, 0.12, 24]} />
+        <meshStandardMaterial color="#a7afb8" metalness={0.9} roughness={0.26} />
+      </mesh>
+
+      <mesh position={[0.19, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.09, 0.105, 0.12, 24]} />
+        <meshStandardMaterial color="#252b31" metalness={0.9} roughness={0.25} />
+      </mesh>
+
+      <mesh position={[0, 0.105, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.092, 0.014, 12, 32]} />
+        <meshStandardMaterial color="#b29354" metalness={0.74} roughness={0.42} />
+      </mesh>
+
+      <SolarArray side={-1} />
+      <SolarArray side={1} />
+
+      {variant !== "weather" && <CommunicationsDish />}
+
+      {variant === "weather" && (
+        <group position={[0.22, 0, 0]}>
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.07, 0.095, 0.18, 24]} />
+            <meshPhysicalMaterial
+              color="#d2d7dc"
+              metalness={0.9}
+              roughness={0.2}
+              clearcoat={0.32}
             />
           </mesh>
-          {panelBars.map((offset) => (
-            <mesh key={offset} position={[offset, 0.012, 0]}>
-              <boxGeometry args={[0.008, 0.006, 0.22]} />
-              <meshBasicMaterial color="#4ea8ff" transparent opacity={0.46} />
-            </mesh>
-          ))}
-          {[-0.07, 0.07].map((z) => (
-            <mesh key={z} position={[0, 0.012, z]}>
-              <boxGeometry args={[0.42, 0.006, 0.006]} />
-              <meshBasicMaterial color="#4ea8ff" transparent opacity={0.42} />
-            </mesh>
-          ))}
+          <mesh position={[0.12, 0, 0]}>
+            <sphereGeometry args={[0.055, 20, 14]} />
+            <meshStandardMaterial color="#10151b" metalness={0.72} roughness={0.18} />
+          </mesh>
         </group>
-      ))}
+      )}
 
-      <pointLight
-        position={[0, 0, 0.32]}
-        color={accent}
-        intensity={0.7}
-        distance={1.1}
-      />
+      <mesh position={[-0.24, 0.055, 0]}>
+        <sphereGeometry args={[0.018, 12, 8]} />
+        <meshBasicMaterial color="#d44343" toneMapped={false} />
+      </mesh>
+      <mesh position={[-0.24, -0.055, 0]}>
+        <sphereGeometry args={[0.014, 12, 8]} />
+        <meshBasicMaterial color="#54d5ff" toneMapped={false} />
+      </mesh>
     </group>
   );
 }
@@ -149,145 +238,129 @@ function OrbitingSatellite({
   const satelliteRef = useRef<Group>(null);
 
   useFrame(({ clock }) => {
-    if (!active || !satelliteRef.current) return;
+    if (!satelliteRef.current) return;
 
-    const angle = config.phase + clock.getElapsedTime() * config.speed;
-    satelliteRef.current.position.set(
-      Math.cos(angle) * config.radius,
-      Math.sin(angle) * config.radius,
-      0,
-    );
+    const elapsed = active ? clock.getElapsedTime() : 0;
+    const angle = config.phase + elapsed * config.speed;
+    const x = Math.cos(angle) * config.radius;
+    const y = Math.sin(angle) * config.radius * config.verticalScale;
+    const z = Math.sin(angle + 0.85) * config.depth;
+
+    satelliteRef.current.position.set(x, y, z);
     satelliteRef.current.rotation.z = angle + Math.PI / 2;
-    satelliteRef.current.rotation.y = Math.sin(angle * 1.7) * 0.22;
+    satelliteRef.current.rotation.y = Math.sin(angle * 1.35) * 0.18;
   });
 
   return (
     <group rotation={[config.inclination, config.tilt, 0]}>
-      <mesh rotation={[0, 0, 0]}>
-        <torusGeometry args={[config.radius, 0.004, 8, 192]} />
+      <mesh scale={[1, config.verticalScale, 1]}>
+        <torusGeometry args={[config.radius, 0.0028, 8, 224]} />
         <meshBasicMaterial
-          color={config.accent}
+          color="#7ca8ce"
           transparent
-          opacity={0.22}
+          opacity={0.14}
           blending={AdditiveBlending}
           depthWrite={false}
+          toneMapped={false}
         />
       </mesh>
       <group ref={satelliteRef} scale={config.scale}>
-        <SatelliteModel accent={config.accent} />
+        <SatelliteModel variant={config.variant} />
       </group>
     </group>
   );
 }
 
+function Atmosphere() {
+  return (
+    <mesh scale={1.075}>
+      <sphereGeometry args={[0.92, 72, 72]} />
+      <shaderMaterial
+        transparent
+        side={BackSide}
+        blending={AdditiveBlending}
+        depthWrite={false}
+        vertexShader={`
+          varying vec3 vNormal;
+          varying vec3 vWorldPosition;
+
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `}
+        fragmentShader={`
+          varying vec3 vNormal;
+          varying vec3 vWorldPosition;
+
+          void main() {
+            vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+            float fresnel = pow(1.0 - max(dot(vNormal, viewDirection), 0.0), 3.2);
+            vec3 color = mix(vec3(0.06, 0.36, 0.62), vec3(0.42, 0.86, 1.0), fresnel);
+            gl_FragColor = vec4(color, fresnel * 0.72);
+          }
+        `}
+      />
+    </mesh>
+  );
+}
+
+function LoadingEarth() {
+  return (
+    <group rotation={[0.08, -0.85, -0.08]}>
+      <mesh>
+        <sphereGeometry args={[0.92, 48, 48]} />
+        <meshStandardMaterial color="#07111d" metalness={0.12} roughness={0.72} />
+      </mesh>
+      <Atmosphere />
+    </group>
+  );
+}
+
 function GlobeWorld({ active }: { active: boolean }) {
-  const worldRef = useRef<Group>(null);
+  const sceneRef = useRef<Group>(null);
+  const earthRef = useRef<Group>(null);
+  const cloudsRef = useRef<Mesh>(null);
   const starsRef = useRef<Points>(null);
-  const texture = useMemo(() => {
-    const width = 2048;
-    const height = 1024;
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+  const gl = useThree((state) => state.gl);
 
-    const context = canvas.getContext("2d");
-    if (!context) return new CanvasTexture(canvas);
+  const [surfaceTexture, normalTexture, lightsTexture, cloudsTexture] = useLoader(
+    TextureLoader,
+    EARTH_TEXTURES,
+  );
 
-    const ocean = context.createLinearGradient(0, 0, 0, height);
-    ocean.addColorStop(0, "#020912");
-    ocean.addColorStop(0.48, "#061624");
-    ocean.addColorStop(1, "#02070e");
-    context.fillStyle = ocean;
-    context.fillRect(0, 0, width, height);
+  const normalScale = useMemo(() => new Vector2(0.56, 0.56), []);
 
-    context.strokeStyle = "rgba(73, 202, 218, 0.11)";
-    context.lineWidth = 1;
-    for (let longitude = 0; longitude <= width; longitude += width / 24) {
-      context.beginPath();
-      context.moveTo(longitude, 0);
-      context.lineTo(longitude, height);
-      context.stroke();
+  useEffect(() => {
+    const anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy());
+
+    surfaceTexture.colorSpace = SRGBColorSpace;
+    lightsTexture.colorSpace = SRGBColorSpace;
+    cloudsTexture.colorSpace = SRGBColorSpace;
+
+    for (const texture of [
+      surfaceTexture,
+      normalTexture,
+      lightsTexture,
+      cloudsTexture,
+    ]) {
+      texture.wrapS = RepeatWrapping;
+      texture.anisotropy = anisotropy;
+      texture.needsUpdate = true;
     }
-    for (let latitude = 0; latitude <= height; latitude += height / 12) {
-      context.beginPath();
-      context.moveTo(0, latitude);
-      context.lineTo(width, latitude);
-      context.stroke();
-    }
-
-    const map = new Path2D(WORLD_MAP_PATH);
-    context.fillStyle = "#0b3f4d";
-    context.fill(map, "evenodd");
-    context.strokeStyle = "rgba(81, 244, 222, 0.94)";
-    context.lineWidth = 2.1;
-    context.stroke(map);
-    context.strokeStyle = "rgba(81, 244, 222, 0.16)";
-    context.lineWidth = 7;
-    context.stroke(map);
-
-    const toCanvasPoint = (longitude: number, latitude: number) => ({
-      x: ((longitude + 180) / 360) * width,
-      y: ((90 - latitude) / 180) * height,
-    });
-
-    context.lineWidth = 1.2;
-    for (const [fromIndex, toIndex] of WORLD_MAP_CONNECTIONS) {
-      const from = WORLD_MAP_CITIES[fromIndex];
-      const to = WORLD_MAP_CITIES[toIndex];
-      if (!from || !to) continue;
-      const start = toCanvasPoint(from[1], from[2]);
-      const end = toCanvasPoint(to[1], to[2]);
-      context.strokeStyle = "rgba(78, 168, 255, 0.2)";
-      context.beginPath();
-      context.moveTo(start.x, start.y);
-      context.quadraticCurveTo(
-        (start.x + end.x) / 2,
-        Math.min(start.y, end.y) - 36,
-        end.x,
-        end.y,
-      );
-      context.stroke();
-    }
-
-    for (const [, longitude, latitude] of WORLD_MAP_CITIES) {
-      const point = toCanvasPoint(longitude, latitude);
-      const glow = context.createRadialGradient(
-        point.x,
-        point.y,
-        0,
-        point.x,
-        point.y,
-        13,
-      );
-      glow.addColorStop(0, "rgba(255, 246, 213, 1)");
-      glow.addColorStop(0.22, "rgba(255, 183, 86, 0.86)");
-      glow.addColorStop(1, "rgba(255, 183, 86, 0)");
-      context.fillStyle = glow;
-      context.beginPath();
-      context.arc(point.x, point.y, 13, 0, Math.PI * 2);
-      context.fill();
-    }
-
-    const nextTexture = new CanvasTexture(canvas);
-    nextTexture.colorSpace = SRGBColorSpace;
-    nextTexture.wrapS = RepeatWrapping;
-    nextTexture.anisotropy = 4;
-    nextTexture.needsUpdate = true;
-    return nextTexture;
-  }, []);
-
-  useEffect(() => () => texture.dispose(), [texture]);
+  }, [cloudsTexture, gl, lightsTexture, normalTexture, surfaceTexture]);
 
   const { starPositions, starColors } = useMemo(() => {
     const positions: number[] = [];
     const colors: number[] = [];
-    const cyan = new Color("#58f5df");
-    const violet = new Color("#8d76ff");
+    const blueWhite = new Color("#d9efff");
+    const coolBlue = new Color("#6ba9d9");
 
-    for (let index = 0; index < 320; index += 1) {
-      const phi = Math.acos(1 - 2 * ((index + 0.5) / 320));
+    for (let index = 0; index < 420; index += 1) {
+      const phi = Math.acos(1 - 2 * ((index + 0.5) / 420));
       const theta = Math.PI * (1 + Math.sqrt(5)) * index;
-      const radius = 1.95 + (index % 11) * 0.035;
+      const radius = 2.15 + (index % 17) * 0.042;
 
       positions.push(
         Math.cos(theta) * Math.sin(phi) * radius,
@@ -295,7 +368,7 @@ function GlobeWorld({ active }: { active: boolean }) {
         Math.cos(phi) * radius,
       );
 
-      const color = cyan.clone().lerp(violet, (index % 17) / 16);
+      const color = blueWhite.clone().lerp(coolBlue, (index % 19) / 18);
       colors.push(color.r, color.g, color.b);
     }
 
@@ -306,73 +379,83 @@ function GlobeWorld({ active }: { active: boolean }) {
   }, []);
 
   useFrame(({ clock, pointer }, delta) => {
-    if (!active || !worldRef.current || !starsRef.current) return;
+    if (!sceneRef.current || !earthRef.current || !starsRef.current) return;
 
-    const elapsed = clock.getElapsedTime();
-    worldRef.current.rotation.y += delta * 0.055;
-    worldRef.current.rotation.x = MathUtils.lerp(
-      worldRef.current.rotation.x,
-      pointer.y * 0.08 + Math.sin(elapsed * 0.22) * 0.025,
-      0.035,
+    const elapsed = active ? clock.getElapsedTime() : 0;
+
+    if (active) {
+      earthRef.current.rotation.y += delta * 0.022;
+      if (cloudsRef.current) cloudsRef.current.rotation.y += delta * 0.012;
+      starsRef.current.rotation.y -= delta * 0.006;
+    }
+
+    sceneRef.current.rotation.x = MathUtils.lerp(
+      sceneRef.current.rotation.x,
+      pointer.y * 0.055 + Math.sin(elapsed * 0.18) * 0.012,
+      0.026,
     );
-    worldRef.current.rotation.z = MathUtils.lerp(
-      worldRef.current.rotation.z,
-      -pointer.x * 0.055,
-      0.035,
+    sceneRef.current.rotation.y = MathUtils.lerp(
+      sceneRef.current.rotation.y,
+      pointer.x * 0.07,
+      0.026,
     );
-    starsRef.current.rotation.y -= delta * 0.012;
-    starsRef.current.rotation.x = Math.sin(elapsed * 0.08) * 0.045;
   });
 
   return (
-    <group>
-      <group ref={worldRef} rotation={[0.06, -0.42, -0.08]}>
+    <group ref={sceneRef} position={[0.08, -0.02, 0]}>
+      <group ref={earthRef} rotation={[0.08, -1.18, -0.1]}>
         <mesh castShadow receiveShadow>
-          <sphereGeometry args={[0.82, 72, 72]} />
-          <meshStandardMaterial
-            map={texture}
-            emissive="#0d8f91"
-            emissiveMap={texture}
-            emissiveIntensity={0.42}
-            metalness={0.18}
-            roughness={0.62}
+          <sphereGeometry args={[0.92, 96, 96]} />
+          <meshPhysicalMaterial
+            map={surfaceTexture}
+            normalMap={normalTexture}
+            normalScale={normalScale}
+            metalness={0.02}
+            roughness={0.76}
+            clearcoat={0.16}
+            clearcoatRoughness={0.72}
           />
         </mesh>
 
-        <mesh scale={1.012}>
-          <sphereGeometry args={[0.82, 36, 36]} />
+        <mesh scale={1.002}>
+          <sphereGeometry args={[0.92, 96, 96]} />
           <meshBasicMaterial
-            color="#72ffe8"
+            map={lightsTexture}
+            transparent
+            opacity={0.78}
+            blending={AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+
+        <mesh ref={cloudsRef} scale={1.009}>
+          <sphereGeometry args={[0.92, 80, 80]} />
+          <meshPhysicalMaterial
+            map={cloudsTexture}
+            transparent
+            opacity={0.38}
+            alphaTest={0.025}
+            depthWrite={false}
+            roughness={0.96}
+            metalness={0}
+          />
+        </mesh>
+
+        <mesh scale={1.013}>
+          <sphereGeometry args={[0.92, 44, 44]} />
+          <meshBasicMaterial
+            color="#68b7d3"
             wireframe
             transparent
-            opacity={0.055}
+            opacity={0.025}
             blending={AdditiveBlending}
             depthWrite={false}
+            toneMapped={false}
           />
         </mesh>
 
-        <mesh scale={1.055}>
-          <sphereGeometry args={[0.82, 56, 56]} />
-          <meshBasicMaterial
-            color="#42e7ff"
-            transparent
-            opacity={0.11}
-            side={BackSide}
-            blending={AdditiveBlending}
-            depthWrite={false}
-          />
-        </mesh>
-
-        <mesh scale={0.74}>
-          <sphereGeometry args={[0.82, 32, 32]} />
-          <meshBasicMaterial
-            color="#18d8c0"
-            transparent
-            opacity={0.08}
-            blending={AdditiveBlending}
-            depthWrite={false}
-          />
-        </mesh>
+        <Atmosphere />
       </group>
 
       {ORBITS.map((config) => (
@@ -392,33 +475,34 @@ function GlobeWorld({ active }: { active: boolean }) {
           <bufferAttribute attach="attributes-color" args={[starColors, 3]} />
         </bufferGeometry>
         <pointsMaterial
-          size={0.018}
+          size={0.013}
           vertexColors
           transparent
-          opacity={0.72}
+          opacity={0.7}
           blending={AdditiveBlending}
           depthWrite={false}
+          toneMapped={false}
         />
       </points>
 
-      <ambientLight intensity={0.72} />
-      <hemisphereLight args={["#8feeff", "#040812", 0.82]} />
+      <ambientLight intensity={0.1} />
+      <hemisphereLight args={["#8bbfe0", "#020409", 0.32]} />
       <directionalLight
-        position={[2.6, 2.1, 3.4]}
-        color="#d7fbff"
-        intensity={1.45}
+        position={[3.6, 2.8, 4.2]}
+        color="#f4fbff"
+        intensity={2.65}
+        castShadow
+      />
+      <directionalLight
+        position={[-2.8, -1.2, 1.6]}
+        color="#245f87"
+        intensity={0.46}
       />
       <pointLight
-        position={[2.2, 0.7, 2]}
-        color="#42f2da"
-        intensity={2.6}
-        distance={5}
-      />
-      <pointLight
-        position={[-2.4, -1.1, 1.2]}
-        color="#7d65ff"
-        intensity={1.8}
-        distance={5}
+        position={[2.4, 1.2, -1.5]}
+        color="#55b7ff"
+        intensity={1.25}
+        distance={6}
       />
     </group>
   );
@@ -432,20 +516,28 @@ function DigitalCoreCanvas(props: ComponentProps<"div">) {
   return (
     <div {...props}>
       <Canvas
-        camera={{ position: [0, 0, 4.4], fov: 37 }}
-        dpr={[1, 1.55]}
+        camera={{ position: [0, 0, 4.75], fov: 34, near: 0.1, far: 100 }}
+        dpr={[1, 1.65]}
         gl={{
           antialias: true,
           alpha: true,
           powerPreference: "high-performance",
+          premultipliedAlpha: true,
+        }}
+        onCreated={({ gl: renderer }) => {
+          renderer.toneMapping = ACESFilmicToneMapping;
+          renderer.toneMappingExposure = 1.08;
+          renderer.outputColorSpace = SRGBColorSpace;
         }}
         frameloop={active ? "always" : "demand"}
         shadows
         fallback={
-          <div className="h-full w-full rounded-full bg-[radial-gradient(circle,rgba(23,227,192,0.2),transparent_68%)]" />
+          <div className="h-full w-full rounded-full bg-[radial-gradient(circle,rgba(69,148,199,0.22),transparent_68%)]" />
         }
       >
-        <GlobeWorld active={active} />
+        <Suspense fallback={<LoadingEarth />}>
+          <GlobeWorld active={active} />
+        </Suspense>
       </Canvas>
     </div>
   );
