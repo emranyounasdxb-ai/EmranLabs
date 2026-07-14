@@ -1,9 +1,9 @@
 name: Format globe preview
 
 on:
-  push:
+  pull_request:
     branches:
-      - feature/3d-globe-satellites
+      - main
 
 permissions:
   contents: read
