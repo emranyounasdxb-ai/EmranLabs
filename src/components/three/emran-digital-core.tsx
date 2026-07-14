@@ -95,7 +95,11 @@ function SatelliteModel({ accent }: { accent: string }) {
 
       <mesh position={[0, 0.24, 0.03]}>
         <cylinderGeometry args={[0.012, 0.012, 0.16, 10]} />
-        <meshStandardMaterial color="#e5edf5" metalness={0.9} roughness={0.18} />
+        <meshStandardMaterial
+          color="#e5edf5"
+          metalness={0.9}
+          roughness={0.18}
+        />
       </mesh>
 
       {[-0.39, 0.39].map((x) => (
@@ -125,12 +129,23 @@ function SatelliteModel({ accent }: { accent: string }) {
         </group>
       ))}
 
-      <pointLight position={[0, 0, 0.32]} color={accent} intensity={0.7} distance={1.1} />
+      <pointLight
+        position={[0, 0, 0.32]}
+        color={accent}
+        intensity={0.7}
+        distance={1.1}
+      />
     </group>
   );
 }
 
-function OrbitingSatellite({ active, config }: { active: boolean; config: OrbitConfig }) {
+function OrbitingSatellite({
+  active,
+  config,
+}: {
+  active: boolean;
+  config: OrbitConfig;
+}) {
   const satelliteRef = useRef<Group>(null);
 
   useFrame(({ clock }) => {
@@ -370,7 +385,10 @@ function GlobeWorld({ active }: { active: boolean }) {
 
       <points ref={starsRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[starPositions, 3]} />
+          <bufferAttribute
+            attach="attributes-position"
+            args={[starPositions, 3]}
+          />
           <bufferAttribute attach="attributes-color" args={[starColors, 3]} />
         </bufferGeometry>
         <pointsMaterial
@@ -385,9 +403,23 @@ function GlobeWorld({ active }: { active: boolean }) {
 
       <ambientLight intensity={0.72} />
       <hemisphereLight args={["#8feeff", "#040812", 0.82]} />
-      <directionalLight position={[2.6, 2.1, 3.4]} color="#d7fbff" intensity={1.45} />
-      <pointLight position={[2.2, 0.7, 2]} color="#42f2da" intensity={2.6} distance={5} />
-      <pointLight position={[-2.4, -1.1, 1.2]} color="#7d65ff" intensity={1.8} distance={5} />
+      <directionalLight
+        position={[2.6, 2.1, 3.4]}
+        color="#d7fbff"
+        intensity={1.45}
+      />
+      <pointLight
+        position={[2.2, 0.7, 2]}
+        color="#42f2da"
+        intensity={2.6}
+        distance={5}
+      />
+      <pointLight
+        position={[-2.4, -1.1, 1.2]}
+        color="#7d65ff"
+        intensity={1.8}
+        distance={5}
+      />
     </group>
   );
 }
@@ -402,7 +434,11 @@ function DigitalCoreCanvas(props: ComponentProps<"div">) {
       <Canvas
         camera={{ position: [0, 0, 4.4], fov: 37 }}
         dpr={[1, 1.55]}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+        }}
         frameloop={active ? "always" : "demand"}
         shadows
         fallback={
