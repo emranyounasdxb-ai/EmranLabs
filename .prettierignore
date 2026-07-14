@@ -5,3 +5,6 @@ build
 dist
 coverage
 pnpm-lock.yaml
+
+# Generated world-map vector data; keep compact for bundle size.
+src/data/world-map-path.ts
