@@ -1,4 +1,4 @@
-# EMRAN LABS
+EMRAN LABS
 
 Building the Future of AI & Digital Experiences
 
