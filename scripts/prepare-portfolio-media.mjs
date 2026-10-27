@@ -59,7 +59,10 @@ for (const project of catalog) {
     .toFile(path.join(output, `${project.id}.png`));
   if (!project.screens) continue;
   await sharp(
-    path.join(root, `docs/assets/${project.id}-mobile-source-2026-10-27.png`),
+    path.join(
+      root,
+      `assets/source/portfolio/${project.id}-mobile-source-2026-10-27.png`,
+    ),
   )
     .webp({ quality: 86, effort: 6 })
     .toFile(

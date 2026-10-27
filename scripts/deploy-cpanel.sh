@@ -7,6 +7,8 @@ SOURCE="/home/emranlabs/repositories/EmranLabs"
 ROOT="/home/emranlabs/apps/emranlabs"
 ENV_FILE="/home/emranlabs/.config/emranlabs/production.env"
 mkdir -p "$ROOT/releases"
+# Apache must be able to traverse the app path; private credentials stay 0600.
+chmod 755 /home/emranlabs/apps "$ROOT" "$ROOT/releases"
 exec 9>"$ROOT/deploy.lock"
 flock -n 9 || exit 0
 cd "$SOURCE"
@@ -17,17 +19,26 @@ if [[ "${1:-}" == "--commit" ]]; then
 fi
 [[ "$(cat "$ROOT/deployed-commit" 2>/dev/null || true)" != "$SHA" ]] || exit 0
 node "$SOURCE/scripts/check-deploy-ci.mjs" "$SHA"
+# Run the tested controller from this commit, including future deployment fixes.
+if [[ "$(git rev-parse HEAD)" != "$SHA" ]]; then
+  git merge --ff-only "$SHA"
+  flock -u 9
+  exec /bin/bash "$SOURCE/scripts/deploy-cpanel.sh" --commit "$SHA"
+fi
 test -f "$ENV_FILE"
 test "$(node --version)" = "v24.22.1"
 RELEASE="$ROOT/releases/${SHA:0:12}-$(date -u +%Y%m%d%H%M%S)"
 mkdir "$RELEASE"
 git archive "$SHA" | tar -x -C "$RELEASE"
+chmod 755 "$RELEASE"
+find "$RELEASE/public" -type d -exec chmod 755 {} +
+find "$RELEASE/public" -type f -exec chmod 644 {} +
 cp "$ENV_FILE" "$RELEASE/.env.local"
 chmod 600 "$RELEASE/.env.local"
 cd "$RELEASE"
 export NEXT_TELEMETRY_DISABLED=1
 CI=1 corepack pnpm install --frozen-lockfile --reporter=append-only
-corepack pnpm build
+corepack pnpm build:hosting
 test -f .next/BUILD_ID
 corepack pnpm check:email
 PORT=3087 NODE_ENV=production node app.js >"$ROOT/smoke.log" 2>&1 &

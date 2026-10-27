@@ -1,273 +1,79 @@
-EMRAN LABS
+# EmranLabs
 
-Building the Future of AI & Digital Experiences
+An interactive portfolio by **Emran Younas**, independent designer, developer and IT professional. A desktop-inspired interface brings project case studies, services and direct contact into one workspace.
 
-EMRAN LABS is a futuristic personal technology portfolio presented as a premium modern desktop operating-system experience for identity, skills, portfolio work, creative labs, professional journey, secure contact, and EM AI portfolio assistance.
+[Visit emranlabs.com](https://emranlabs.com)
 
-## Step 1 foundation status
+## Experience
 
-Step 1 established a clean Next.js application with TypeScript, Tailwind CSS, reusable design tokens, site metadata, basic SEO routes, documentation, and a minimal foundation verification page.
+- Window management, animated dock, search, light/dark appearance and keyboard shortcuts.
+- Project collections, case studies and captioned screen tours.
+- Responsive contact forms and direct call, WhatsApp, SMS and email links.
+- Calendar, clock and weather widgets with saved preferences.
+- Accessible motion settings, search metadata and consent-controlled analytics.
+- Server-side enquiry delivery with branded email confirmations.
 
-## Step 2 desktop shell status
+## Stack
 
-The current experience includes the first functional EMRAN LABS desktop shell with a premium full-screen background, top system bar, application workspace, centered dock, typed desktop app registry, and reusable app icon and window frame components.
+Next.js · React · TypeScript · Tailwind CSS · Motion · Zustand · Playwright
 
-Window management supports opening, closing, minimizing, restoring, focusing, layering, and desktop pointer dragging with viewport boundary clamping. Enabled Step 2 applications include About Identity, Skills, Portfolio Projects, and Contact, while Creative Labs, Professional Journey, and EM AI remain visible as later-phase applications.
+Exact dependency versions are pinned in `package.json` and `pnpm-lock.yaml`. Node.js is pinned in `.nvmrc`; pnpm is managed through Corepack.
 
-Responsive behavior keeps windows movable on larger screens and presents one active application as a safer near-full-screen panel with a compact bottom dock on mobile and tablet layouts. Keyboard-accessible controls, visible focus states, Escape-to-close behavior, and reduced-motion support are included in the shell foundation.
+## Local development
 
-## Step 3 command center status
+Install the Node.js version in `.nvmrc`, then:
 
-The desktop includes a global Command Center that opens from the top system bar, the compact mobile dock launcher, or Control/Command + K. It searches enabled applications and desktop actions, supports keyboard result navigation, and restores focus when closed.
-
-Desktop actions include minimizing the active window, closing the active window, closing all windows, restoring minimized windows, and resetting open windows to their default layout while preserving minimized state. The command surface adapts from a centered desktop modal to a mobile-safe sheet with accessible dialog semantics and touch-friendly controls.
-
-## Step 4 portfolio applications status
-
-The portfolio applications use a typed content system as the single source of truth for identity, focus areas, skill groups, product ecosystems, and confirmed professional channels.
-
-About Identity, Skills, Portfolio Projects, and Contact are polished application experiences with categorized content, reusable project cards, accessible in-window project details, and confirmed external links. Creative Labs, Professional Journey, and EM AI remain visible but disabled for later phases.
-
-Selective 3D experiences, cinematic motion, and EM AI functionality continue through later implementation steps.
-
-## Technology foundation
-
-- Next.js App Router
-- React
-- TypeScript strict mode
-- Tailwind CSS
-- ESLint
-- Prettier with Tailwind class sorting
-- shadcn/ui-compatible configuration
-- `@/*` import alias
-
-## Runtime requirements
-
-- Node.js 24.22.1 LTS (pinned in `.nvmrc`, `.node-version`, and `devEngines.runtime`)
-- pnpm 12.15.0
-- Corepack 0.36.0
-
-pnpm installs the pinned Node runtime locally and uses it for project scripts.
-On this Windows checkout, run `.\scripts\pnpm.ps1 dev` (or `build`, `start`,
-`typecheck`, `check:desktop`) to use the project-local Corepack. This avoids
-changing other applications' Node installations.
-
-For a fresh checkout, install Corepack 0.36.0, enable it, then run
-`corepack pnpm install --frozen-lockfile`. The package-manager and runtime pins
-are also used by CI.
-
-The application compiler is TypeScript 7.0.2. Only ESLint's parser receives the
-official `@typescript/typescript6` compatibility package through the scoped
-`.pnpmfile.cjs` install hook, because that parser still depends on the
-JavaScript compiler API. Application type checks and Next.js builds use TS 7.
-
-## Commands
-
-Install dependencies:
-
-```bash
-pnpm install
+```sh
+corepack enable
+corepack pnpm install --frozen-lockfile
+cp .env.example .env.local
+corepack pnpm dev
 ```
 
-Start development server:
+Open [localhost:3000](http://localhost:3000). On Windows, use `Copy-Item .env.example .env.local` instead of `cp`. The project also includes `scripts/pnpm.ps1` for environments that need the local Corepack launcher.
 
-```bash
-pnpm dev
+Configure SMTP privately to enable enquiry delivery. The optional AI endpoint needs a server-side API key. Analytics is disabled on localhost and requires visitor consent on the production domain. Never commit `.env.local` or credentials.
+
+## Quality checks
+
+```sh
+corepack pnpm lint
+corepack pnpm typecheck
+corepack pnpm format:check
+corepack pnpm check:desktop
+corepack pnpm test:email
+corepack pnpm test:analytics
+corepack pnpm test:deployment
+corepack pnpm build
+corepack pnpm build:hosting
+corepack pnpm exec playwright install chromium firefox webkit
+corepack pnpm test:browser
 ```
 
-Run linting:
+Email unit tests use mocks and do not send messages. Screenshot baselines use Chromium on Windows; functional tests cover Chromium, Firefox, WebKit and a mobile viewport. The dedicated performance run is separate from CI because its timing depends on the machine.
 
-```bash
-pnpm lint
+## Project structure
+
+```text
+src/app/          Pages, metadata and server routes
+src/components/   Desktop workspace, project views and UI
+src/lib/          Validation, email, analytics and server helpers
+src/styles/       Desktop appearance and motion
+public/           Website images, fonts, icons and videos
+assets/source/    Source artwork for reproducible asset generation
+tests/            Unit, browser and visual regression checks
+scripts/          Development, asset and deployment utilities
+.github/          Automated quality checks
 ```
-
-Run type checking:
-
-```bash
-pnpm typecheck
-```
-
-Check formatting:
-
-```bash
-pnpm format:check
-```
-
-Format files:
-
-```bash
-pnpm format
-```
-
-Create a production build:
-
-```bash
-pnpm build
-```
-
-## Step 6 status
-
-Step 6 has been merged and deployed. It introduced the cinematic desktop background direction, pointer-responsive depth, selective 3D digital core behavior, reduced-motion and WebGL capability safeguards, and deployment-safe production refinements.
-
-## Step 7 status
-
-Step 7 enables EM AI as a portfolio-grounded assistant and upgrades Contact with a secure professional inquiry form. EM AI uses server-side OpenAI Responses API calls only when `OPENAI_API_KEY` and `OPENAI_MODEL` are configured. Contact delivery uses server-side SMTP only when the contact SMTP variables are configured. Missing secrets leave the website, desktop, confirmed channels, and production build functional while the affected service returns a safe unavailable response.
-
-The EM AI and Contact API routes include same-origin checks, Fetch Metadata handling where supported, JSON body limits, Zod validation, bounded in-memory application-level rate limiting, safe public error responses, and operational logging that avoids message bodies, secrets, provider errors, and model output. This limiter is a baseline for the current single cPanel Passenger application and is not a globally distributed rate limiter. Client identifiers are derived from cPanel Passenger proxy headers with `x-real-ip` expected as the canonical client address when present; raw IP addresses are never logged or persisted.
-
-## Environment variables
-
-Required for EM AI service availability:
-
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL` — set this to a Responses API-compatible model available to the configured OpenAI project.
-
-Required for secure Contact form delivery:
-
-- `CONTACT_SMTP_HOST`
-- `CONTACT_SMTP_PORT`
-- `CONTACT_SMTP_SECURE`
-- `CONTACT_SMTP_USER`
-- `CONTACT_SMTP_PASSWORD`
-- `CONTACT_TO_EMAIL`
-- `CONTACT_FROM_EMAIL`
-
-Optional server-only controls:
-
-- `CONTACT_REPLY_NAME`
-- `CONTACT_RATE_LIMIT_MAX`
-- `CONTACT_RATE_LIMIT_WINDOW_MS`
-- `AI_RATE_LIMIT_MAX`
-- `AI_RATE_LIMIT_WINDOW_MS`
-
-Runtime secrets are configured in cPanel Application Manager. Do not commit real keys, email passwords, SMTP passwords, or production credentials.
 
 ## Deployment
 
-See [the current deployment guide](docs/deployment.md). The 27 October release uses isolated build folders, a private runtime environment, successful GitHub Actions checks, and an atomic Passenger release switch. Earlier step notes below describe the previous implementation.
+Push to `main` to run GitHub Actions. The cPanel deployment controller checks for updates every two minutes and activates only the exact commit whose complete quality workflow passed. Each release is installed, built and smoke-tested in its own folder before the Passenger application is switched. The previous release remains available for rollback.
 
-## Step 5: Professional Journey and Creative Labs
+Runtime credentials are stored privately on the hosting server, outside the repository and public web root. CI checks, environment files and build output are not served as website pages.
 
-- Enabled the Professional Journey desktop application with a truthful capability-evolution narrative for the EMRAN LABS professional direction, avoiding fabricated employment history, dates, employers, metrics, or unsupported achievements.
-- Enabled the Creative Labs desktop application as a set of exploration themes and concept directions, with in-window detail views for focus areas, methods, and key exploration questions.
-- Professional Journey and Creative Labs are available through the desktop registry, desktop icons, dock, and Command Center application results.
-- EM AI remained visible but disabled until Step 7.
+Hosting uses Next.js's supported Webpack build because the server's system libraries cannot load the current Turbopack native compiler. CI validates this production build; local development can continue using Turbopack.
 
-## Step 8 status — final launch polish
+## Assets
 
-Step 8 completes the final production-review polish for SEO, accessibility, analytics, security headers, error states, and launch operations while preserving the desktop architecture, selective 3D safeguards, EM AI server route, secure Contact server route, and cPanel Passenger deployment model.
-
-### Current desktop applications
-
-- About Identity
-- Skills
-- Portfolio Projects
-- Creative Labs
-- Professional Journey
-- Contact
-- EM AI
-
-### SEO, social sharing, and structured data
-
-The App Router metadata now uses `NEXT_PUBLIC_SITE_URL` as the canonical origin, with `https://emranlabs.com` as the production fallback. The public sitemap contains the portfolio homepage only, API routes are excluded from robots indexing, Open Graph and Twitter image routes generate branded EMRAN LABS social cards, and JSON-LD is limited to the confirmed website/profile/person/project-list content.
-
-### EM AI scope
-
-EM AI is a portfolio-grounded assistant for concise questions about confirmed EMRAN LABS content, projects, skills, and professional direction. It is not a general chatbot, does not run OpenAI code in the browser, and returns a safe unavailable state when required server variables are missing.
-
-### Contact delivery architecture
-
-The Contact application submits bounded validated JSON to the server route. Delivery uses the configured SMTP mailbox only when the server-only SMTP variables are present. Users are warned not to submit passwords, API keys, financial details, medical information, or other sensitive data.
-
-### Optional analytics configuration
-
-Optional Google Analytics is enabled only through Google Tag Manager after a visitor allows analytics. Use one public variable:
-
-- `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID`
-
-The implementation stores only the local consent choice (`granted` or `denied`) and emits predefined non-sensitive product events after consent. It never sends AI message bodies, AI responses, contact names, contact email addresses, companies, subjects, messages, SMTP data, OpenAI request content, or full conversation history.
-
-### Google Tag Manager and Google Analytics 4 setup
-
-A. Google Analytics:
-
-- Create or select the EMRAN LABS GA4 property.
-- Create the web data stream for `https://emranlabs.com`.
-- Copy the Measurement ID that begins with `G-`. Do not commit it to source code.
-
-B. Google Tag Manager:
-
-- Create or select the EMRAN LABS Web container.
-- Copy the container ID that begins with `GTM-`.
-- Add the GTM container ID to cPanel Application Manager as `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID=GTM-...`.
-- Rebuild and deploy after changing this `NEXT_PUBLIC` variable.
-
-C. Inside GTM:
-
-- Create a Google Tag.
-- Enter the GA4 Tag ID / Measurement ID beginning with `G-`.
-- Use the appropriate initialization/all-pages trigger.
-- Configure consent requirements so analytics tags require `analytics_storage`.
-- Create GA4 event handling for approved custom event names: `application_opened`, `project_detail_opened`, `command_center_opened`, `contact_form_submitted`, and `em_ai_opened`.
-- Verify with Tag Assistant Preview.
-- Publish the GTM container only after successful verification.
-
-D. Verification:
-
-- Confirm GTM in Tag Assistant.
-- Confirm the GA4 Realtime report receives a visit after consent.
-- Confirm no analytics request occurs after Decline.
-- Confirm no duplicate `page_view` events.
-- Confirm custom event names appear only after consent.
-
-### Required environment variables
-
-Public:
-
-- `NEXT_PUBLIC_SITE_URL`
-- `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID`
-
-Server-only:
-
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL`
-- `CONTACT_SMTP_HOST`
-- `CONTACT_SMTP_PORT`
-- `CONTACT_SMTP_SECURE`
-- `CONTACT_SMTP_USER`
-- `CONTACT_SMTP_PASSWORD`
-- `CONTACT_TO_EMAIL`
-- `CONTACT_FROM_EMAIL`
-- `CONTACT_REPLY_NAME`
-- `AI_RATE_LIMIT_MAX`
-- `AI_RATE_LIMIT_WINDOW_MS`
-- `CONTACT_RATE_LIMIT_MAX`
-- `CONTACT_RATE_LIMIT_WINDOW_MS`
-
-### Production deployment workflow
-
-Use the current [deployment and rollback guide](docs/deployment.md). Every push to main must pass the complete Quality checks workflow before the server activates it.
-
-### Production smoke-test checklist
-
-- DNS resolves to the canonical HTTPS domain.
-- `NEXT_PUBLIC_SITE_URL` matches the canonical production origin.
-- OpenAI and SMTP variables are configured or unavailable states are accepted.
-- Optional analytics is either disabled or configured with a valid Google Tag Manager container ID and visitor consent.
-- `/robots.txt`, `/sitemap.xml`, `/manifest.webmanifest`, `/opengraph-image`, `/twitter-image`, and `/favicon.ico` respond successfully.
-- Desktop smoke test covers About, Skills, Projects, Creative Labs, Journey, Contact, EM AI, Dock, Command Center, window open/focus/move/minimize/restore/close, and no console hydration errors.
-- Mobile smoke test covers 390px, 430px, 768px, 1024px, and 1440px widths where practical.
-- Keyboard test covers skip link, desktop icons, dock, Command Center, window controls, Contact form, and EM AI composer/actions.
-- Contact delivery test confirms success and missing-service fallback.
-- EM AI test confirms success and missing-service fallback.
-- Rate-limit test confirms generic public responses and `Retry-After` behavior.
-- Server logs contain no message bodies, secrets, provider details, or model output.
-- Rollback readiness is confirmed before deployment.
-
-### Rollback notes
-
-If production smoke tests fail after deployment, restore the previous known-good repository commit and rerun `bash scripts/deploy-cpanel.sh`. Keep the previous `.next` backup generated by the deployment workflow until the new release is verified.
-
-### Security limitations and future hardening
-
-Current hardening includes safe browser headers, same-origin and Fetch Metadata request guards, bounded payloads, rate limiting, generic public API errors, server-only OpenAI/SMTP integrations, consent-aware optional Google Tag Manager loading, and no committed secrets. A strict Content Security Policy is intentionally deferred until it can be fully tested with Next.js runtime scripts, optional analytics, fonts, and WebGL without breaking the desktop experience.
+See [ASSETS.md](ASSETS.md) for third-party attribution. Brand marks identify the tools and platforms shown in the portfolio; they do not imply affiliation or endorsement.

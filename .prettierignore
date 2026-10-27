@@ -18,3 +18,4 @@ docs/email/assets/source/*LICENSE*
 
 # Generated world-map vector data; keep compact for bundle size.
 src/data/world-map-path.ts
+assets/source/email/*LICENSE*

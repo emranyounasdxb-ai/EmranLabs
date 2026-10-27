@@ -65,12 +65,22 @@ jobs:
         run: pnpm format:check
 
       - name: Build application
-        run: pnpm build
+        run: pnpm build:hosting
 
   desktop-browsers:
-    name: Desktop browser and visual regression
+    name: Browser checks — ${{ matrix.engine }}
     runs-on: windows-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - engine: chromium
+            projects: --project=chromium
+          - engine: firefox
+            projects: --project=firefox
+          - engine: webkit
+            projects: --project=webkit --project=phone
     env:
       NEXT_TELEMETRY_DISABLED: 1
       # Public identifier; localhost is blocked from sending analytics.
@@ -87,7 +97,7 @@ jobs:
           corepack enable
           corepack prepare pnpm@12.15.0 --activate
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install chromium firefox webkit
-      - run: pnpm build
+      - run: pnpm exec playwright install ${{ matrix.engine }}
+      - run: pnpm build:hosting
       - name: Functional and visual checks
-        run: pnpm test:browser --grep-invert "motion stays interactive"
+        run: pnpm test:browser ${{ matrix.projects }} --grep-invert "motion stays interactive"

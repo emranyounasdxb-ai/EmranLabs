@@ -58,3 +58,8 @@ Thumbs.db
 # Private deployment material stays outside source control.
 .deploy-private/
 .release/
+
+# Working notes, account setup evidence, and generated email previews stay local.
+/docs/
+/LOCAL-PREVIEW.md
+/scripts/prepare-analytics-container.mjs
