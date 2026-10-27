@@ -334,7 +334,7 @@ export function MacDesktop() {
       window.history[replace ? "replaceState" : "pushState"](null, "", url);
   }
   const applyLocation = useEffectEvent(() => {
-    const next = parseDesktopLocation(location.search);
+    const next = parseDesktopLocation(location.pathname + location.search);
     if (next.app === "projects") {
       setCollection(next.collection);
       setSelected(projects.find((p) => p.id === next.project) ?? null);
@@ -343,6 +343,7 @@ export function MacDesktop() {
     setQuickLook(null);
     windowApis.current.get(next.app)?.restore();
     dispatchWindow({ type: "open", id: next.app });
+    writeLocation(next.app, next.collection, next.project, true);
   });
   function rememberEnquiryContext(context: EnquiryContext) {
     setEnquiryContext(context);
@@ -586,7 +587,9 @@ export function MacDesktop() {
           setShowSidebar(saved.showSidebar);
         }
         const params = new URLSearchParams(location.search);
-        const linked = parseDesktopLocation(location.search);
+        const linked = parseDesktopLocation(
+          location.pathname + location.search,
+        );
         const matchesSavedView =
           saved &&
           desktopUrl(linked.app, linked.collection, linked.project) ===
@@ -594,7 +597,8 @@ export function MacDesktop() {
         if (
           !saved ||
           (!matchesSavedView &&
-            ["app", "collection", "project"].some((key) => params.has(key)))
+            (location.pathname.startsWith("/workspace/") ||
+              ["app", "collection", "project"].some((key) => params.has(key))))
         )
           applyLocation();
         else
@@ -1677,7 +1681,7 @@ export function MacDesktop() {
                                 <p>{getService(collection)!.description}</p>
                                 <a
                                   className="primary-button"
-                                  href={`/contact?service=${getService(collection)!.id}`}
+                                  href={`/contact/service/${getService(collection)!.id}`}
                                 >
                                   Share your brief <ArrowRight size={14} />
                                 </a>

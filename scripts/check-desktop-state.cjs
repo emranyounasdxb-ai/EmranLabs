@@ -1,7 +1,10 @@
 const assert = require("node:assert/strict");
 const { load } = require("./load-workspace-checks.cjs");
 const { windowReducer, initialDesktopState } = load("window-manager");
-const { desktopUrl, parseDesktopLocation } = load("desktop-location");
+const { desktopUrl, parseDesktopLocation, desktopRoutes } =
+  load("desktop-location");
+const { contactUrl, parseContactPath, parseContactLocation } =
+  load("contact-location");
 let state = initialDesktopState;
 const send = (action) => (state = windowReducer(state, action));
 send({ type: "open", id: "notes" });
@@ -48,18 +51,55 @@ for (const app of [
   "services",
 ]) {
   const url = desktopUrl(app);
-  assert.equal(parseDesktopLocation(url.slice(url.indexOf("?") + 1)).app, app);
+  assert.equal(parseDesktopLocation(url).app, app);
 }
 assert.equal(parseDesktopLocation("?project=edrive").project, "edrive");
 assert.equal(parseDesktopLocation("?project=unknown&app=bad").app, "projects");
 assert.equal(parseDesktopLocation("?collection=Next.js").collection, "Next.js");
 assert.equal(
   desktopUrl("projects", "All Projects", null),
-  "/?collection=All+Projects",
+  "/workspace/projects",
 );
 assert.equal(
   parseDesktopLocation("?app=contact&project=inaya").app,
   "projects",
+);
+assert.equal(
+  new Set(desktopRoutes.map(({ path }) => path)).size,
+  desktopRoutes.length,
+);
+for (const { path, location } of desktopRoutes) {
+  assert.match(path, /^\/workspace\/[a-z0-9/-]+$/);
+  assert.deepEqual(parseDesktopLocation(path), location);
+  assert.equal(
+    desktopUrl(location.app, location.collection, location.project),
+    path,
+  );
+}
+assert.equal(
+  contactUrl({ project: "eDrive", tool: "Figma" }),
+  "/contact/project/edrive/tool/figma",
+);
+assert.deepEqual(parseContactPath("/contact/project/edrive/tool/figma"), {
+  project: "eDrive",
+  tool: "Figma",
+});
+assert.equal(
+  contactUrl(parseContactLocation("/contact", "?service=business-automation")),
+  "/contact/service/business-automation",
+);
+for (const invalid of [
+  "/contact/project/missing",
+  "/contact/project",
+  "/contact/project/edrive/project/inaya",
+  "/contact/email/customer@example.com",
+  "/contact/tool/missing",
+  "/contact/service/missing",
+])
+  assert.equal(parseContactPath(invalid), null);
+assert.equal(
+  contactUrl({ project: "customer@example.com", tool: "unknown" }),
+  "/contact",
 );
 console.log(
   "Window lifecycle, duplicate prevention, focus restoration and URL round-trip checks passed.",

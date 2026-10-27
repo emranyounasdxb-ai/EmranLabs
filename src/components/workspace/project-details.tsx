@@ -26,7 +26,7 @@ export function ProjectDetails({
         Discuss a project <ArrowUpRight size={14} />
       </button>
     ) : (
-      <Link className={className} href={`/contact?project=${project.id}`}>
+      <Link className={className} href={`/contact/project/${project.id}`}>
         Discuss a project <ArrowUpRight size={14} />
       </Link>
     );

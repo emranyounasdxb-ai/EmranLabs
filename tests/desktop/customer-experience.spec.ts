@@ -71,7 +71,7 @@ test("welcome actions and confirmed social destinations are clear", async ({
   await welcome
     .getByRole("button", { name: "View Projects", exact: true })
     .click();
-  await expect(page).toHaveURL(/collection=All\+Projects/);
+  await expect(page).toHaveURL(/\/workspace\/projects$/);
 });
 
 test("sidebar groups persist, reveal a selected tool, and carry it to an enquiry", async ({
@@ -145,6 +145,7 @@ test("enquiry delivery handles success and failure without sending real email", 
     );
   });
   await page.goto("/contact?project=edrive&tool=Figma");
+  await expect(page).toHaveURL(/\/contact\/project\/edrive\/tool\/figma$/);
   await expect(page.locator(".enquiry-context")).toContainText(
     "eDrive · Figma",
   );

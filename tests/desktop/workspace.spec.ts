@@ -80,7 +80,7 @@ test("Launchpad filters and opens a collection; search remains independent", asy
     dialog.getByRole("button", { name: "Python", exact: true }),
   ).toBeVisible();
   await dialog.getByRole("button", { name: "Python", exact: true }).click();
-  await expect(page).toHaveURL(/collection=Python/);
+  await expect(page).toHaveURL(/\/workspace\/collections\/python$/);
   await expect(dialog).not.toBeVisible();
   await page
     .getByRole("button", { name: "Search workspace", exact: true })

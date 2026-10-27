@@ -39,6 +39,7 @@ fs.writeFileSync(
       "window-manager",
       "window-geometry",
       "desktop-location",
+      "contact-location",
       "desktop-preferences",
       "widget-data",
     ].map((name) => path.join(sourceRoot, `${name}.ts`)),

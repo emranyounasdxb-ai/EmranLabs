@@ -50,7 +50,7 @@ for attempt in {1..30}; do
   sleep 1
 done
 [[ "$READY" == 1 ]]
-for route in /contact /services /projects/edrive /robots.txt /sitemap.xml; do
+for route in /contact /services /projects/edrive /workspace/projects/edrive /workspace/settings /contact/service/business-automation /robots.txt /sitemap.xml; do
   curl --fail --silent "http://127.0.0.1:3087$route" > /dev/null
 done
 # Empty input must reach validation (400), not fail the production origin guard.

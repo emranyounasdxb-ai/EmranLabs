@@ -62,7 +62,7 @@ export default async function ServicePage({
         </span>
         <h1>{service.title}</h1>
         <p className="services-lead">{service.description}</p>
-        <a className="primary-button" href={`/contact?service=${service.id}`}>
+        <a className="primary-button" href={`/contact/service/${service.id}`}>
           Discuss your project <ArrowRight size={15} />
         </a>
         <div className="service-scope">
@@ -124,7 +124,7 @@ export default async function ServicePage({
           <p>
             Scope, price, schedule and support are agreed before work starts.
           </p>
-          <a className="primary-button" href={`/contact?service=${service.id}`}>
+          <a className="primary-button" href={`/contact/service/${service.id}`}>
             Tell me about your project <ArrowRight size={15} />
           </a>
         </div>

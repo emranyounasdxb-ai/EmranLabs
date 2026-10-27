@@ -2,18 +2,18 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowUpRight, Check, Copy, Mail } from "lucide-react";
 import { projects, socialLinks, socialLabels } from "./workspace-data";
-import { workspaceTools } from "./workspace-tools";
+import {
+  contactUrl,
+  parseContactLocation,
+  type EnquiryContext,
+} from "./contact-location";
 import { confirmationFeedback } from "@/lib/email/delivery-flow";
 import { ContactChannels } from "./contact-channels";
 import { getService } from "./service-catalog";
 import { trackEvent } from "@/lib/analytics/client";
 
 export const contactEmail = "helo@emranlabs.com";
-export type EnquiryContext = {
-  project?: string;
-  tool?: string;
-  service?: string;
-};
+export type { EnquiryContext } from "./contact-location";
 const services = {
   "Website or web application": "Web application",
   "Business workflow or automation": "SaaS or business automation",
@@ -46,18 +46,15 @@ export function ContactPanel({ context }: { context?: EnquiryContext }) {
   useEffect(() => {
     startedAt.current = Date.now();
     if (!context) {
-      const params = new URLSearchParams(location.search);
+      const linkedContext = parseContactLocation(
+        location.pathname,
+        location.search,
+      );
       // Read browser-only URL context once after the SSR form hydrates.
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setUrlContext({
-        service: getService(params.get("service") ?? undefined)?.id,
-        project: projects.find(
-          (project) => project.id === params.get("project"),
-        )?.name,
-        tool: workspaceTools.find(
-          (tool) => tool.collection === params.get("tool"),
-        )?.collection,
-      });
+      setUrlContext(linkedContext);
+      if (location.search)
+        history.replaceState(null, "", contactUrl(linkedContext));
     }
     const controller = new AbortController();
     fetch("/api/contact", {

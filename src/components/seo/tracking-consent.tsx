@@ -465,7 +465,8 @@ export function TrackingConsent({
             Change your mind anytime in Privacy preferences.
           </p>
         </section>
-      ) : pathname !== "/" || inline ? (
+      ) : (pathname !== "/" && !pathname.startsWith("/workspace/")) ||
+        inline ? (
         <button
           ref={toggleRef}
           className={styles.toggle}

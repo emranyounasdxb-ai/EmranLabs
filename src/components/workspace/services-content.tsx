@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ArrowRight,
   Globe,
@@ -97,9 +98,9 @@ export function ServicesContent({ onContact }: { onContact?: () => void }) {
             Start a conversation <ArrowRight size={15} />
           </button>
         ) : (
-          <a className="primary-button" href="/contact">
+          <Link className="primary-button" href="/contact">
             Start a conversation <ArrowRight size={15} />
-          </a>
+          </Link>
         )}
       </div>
     </article>

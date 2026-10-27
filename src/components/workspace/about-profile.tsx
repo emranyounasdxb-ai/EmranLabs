@@ -81,7 +81,7 @@ export function AboutProfile({ onExplore }: { onExplore?: () => void }) {
             Explore my work <ArrowRight size={14} />
           </button>
         ) : (
-          <Link className="primary-button" href="/?collection=All+Projects">
+          <Link className="primary-button" href="/workspace/projects">
             Explore my work <ArrowRight size={14} />
           </Link>
         )}

@@ -45,7 +45,10 @@ test("creative tools open honest collections and load their branded icons", asyn
       .toBe(true);
     await tool.click();
     await expect(page).toHaveURL(
-      (url) => url.searchParams.get("collection") === label,
+      (url) =>
+        url.pathname ===
+          `/workspace/collections/${label.toLowerCase().replaceAll(" ", "-")}` &&
+        url.search === "",
     );
     await expect(
       page.getByRole("heading", { name: `Built with ${label}.`, exact: true }),
