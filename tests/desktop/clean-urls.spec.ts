@@ -1,4 +1,4 @@
-import { test, expect, openDesktop } from "./fixtures";
+import { test, expect, openDesktop, enterDesktop } from "./fixtures";
 
 test("Back can leave the desktop for a public page", async ({ page }) => {
   await page.goto("/about");
@@ -9,6 +9,7 @@ test("Back can leave the desktop for a public page", async ({ page }) => {
     .getByRole("link", { name: "Explore my work", exact: true })
     .click();
   await expect(page).toHaveURL(/\/workspace\/projects$/);
+  await enterDesktop(page);
   await expect(page.locator(".mac-desktop")).toBeVisible();
   await page.goBack();
   await expect(page).toHaveURL(/\/about$/);

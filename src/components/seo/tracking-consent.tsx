@@ -43,6 +43,7 @@ import {
   stopClarity,
 } from "@/lib/analytics/client";
 import styles from "./tracking-consent.module.css";
+import { isWorkspacePath, useWorkspaceEntry } from "../workspace/entry-session";
 
 type Choices = {
   google: boolean;
@@ -117,6 +118,7 @@ export function TrackingConsent({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const pathname = usePathname();
+  const workspaceEntered = useWorkspaceEntry();
   const {
     containerId,
     metaPixelId,
@@ -298,7 +300,12 @@ export function TrackingConsent({
     window.setTimeout(() => headingRef.current?.focus(), 0);
   }
 
-  if (!hydrated || !enabled) return null;
+  if (
+    !hydrated ||
+    !enabled ||
+    (!inline && isWorkspacePath(pathname) && !workspaceEntered)
+  )
+    return null;
   const services = [
     {
       key: "clarity" as const,

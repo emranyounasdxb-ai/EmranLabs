@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { enterDesktop } from "./fixtures";
 
 const trackers =
   /googletagmanager\.com|google-analytics\.com|connect\.facebook\.net|facebook\.com\/tr|snap\.licdn\.com|px\.ads\.linkedin\.com|clarity\.ms/;
@@ -237,6 +238,7 @@ test("desktop stays clear; privacy controls open from Settings", async ({
   page,
 }) => {
   await page.goto("/");
+  await enterDesktop(page);
   await expect(page.locator(".mac-desktop")).toBeVisible();
   await page
     .getByRole("button", { name: "Use limited mode", exact: true })

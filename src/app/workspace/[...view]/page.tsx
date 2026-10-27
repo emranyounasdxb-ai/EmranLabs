@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MacDesktop } from "@/components/workspace/mac-desktop";
+import { DesktopEntry } from "@/components/workspace/desktop-entry";
 import { desktopRoutes } from "@/components/workspace/desktop-location";
 
 export const dynamicParams = false;
@@ -22,5 +23,9 @@ export default async function WorkspacePage({
     !desktopRoutes.some(({ path }) => path === `/workspace/${view.join("/")}`)
   )
     notFound();
-  return <MacDesktop />;
+  return (
+    <DesktopEntry>
+      <MacDesktop />
+    </DesktopEntry>
+  );
 }

@@ -35,8 +35,20 @@ export const test = base.extend<{ fixedClock: boolean }>({
   },
 });
 export { expect };
+export async function enterDesktop(page: Page) {
+  // Entry is a real visitor action. Do not bypass it with seeded storage.
+  const guest = page.getByRole("button", {
+    name: "Enter as Guest",
+    exact: true,
+  });
+  if (await page.locator("[data-workspace-entry]").count()) {
+    await guest.click();
+    await expect(page.locator("[data-workspace-entry]")).toHaveCount(0);
+  }
+}
 export async function openDesktop(page: Page, path = "/") {
   await page.goto(path);
+  await enterDesktop(page);
   await expect(page.locator(".mac-desktop")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Open Control Center", exact: true }),

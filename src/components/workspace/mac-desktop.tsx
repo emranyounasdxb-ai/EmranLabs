@@ -510,7 +510,7 @@ export function MacDesktop() {
     }
   }
   const handleShortcut = useEffectEvent((event: KeyboardEvent) => {
-    if (document.querySelector("dialog[open]")) return;
+    if (document.querySelector("dialog[open], [data-workspace-entry]")) return;
     if (event.altKey && event.key === "9") {
       event.preventDefault();
       setMissionControl(true);
