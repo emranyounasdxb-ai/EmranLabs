@@ -15,6 +15,16 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   images: { qualities: [75, 80, 85] },
   distDir: process.env.EMRANLABS_DIST_DIR?.trim() || ".next",
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.emranlabs.com" }],
+        destination: "https://emranlabs.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
