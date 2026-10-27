@@ -44,16 +44,6 @@ Thumbs.db
 
 # Local review evidence and account dashboards are not website source.
 /*.png
-/docs/*.png
-/docs/assets/*
-!/docs/assets/emran-horizon-source.png
-!/docs/assets/emranlabs-*-customer-source.png
-!/docs/assets/edrive-mobile-source-2026-10-27.png
-!/docs/assets/inaya-mobile-source-2026-10-27.png
-!/docs/assets/wordpress-*
-/docs/email/*.html
-/docs/email/*.txt
-/docs/analytics/gtm-before-event-parameters.json
 
 # Private deployment material stays outside source control.
 .deploy-private/

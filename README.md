@@ -32,7 +32,11 @@ corepack pnpm dev
 
 Open [localhost:3000](http://localhost:3000). On Windows, use `Copy-Item .env.example .env.local` instead of `cp`. The project also includes `scripts/pnpm.ps1` for environments that need the local Corepack launcher.
 
-Configure SMTP privately to enable enquiry delivery. The optional AI endpoint needs a server-side API key. Analytics is disabled on localhost and requires visitor consent on the production domain. Never commit `.env.local` or credentials.
+Configure SMTP privately to enable enquiry delivery. The optional AI endpoint needs a server-side API key. All analytics is disabled on localhost. Never commit `.env.local` or credentials.
+
+The right-side privacy card opens on a first visit and stays dismissed once choices are saved. Desktop Settings and standalone-page shortcuts reopen it. Google Analytics through Tag Manager, Meta Pixel, Clarity analytics cookies and optional LinkedIn Insight have independent opt-ins. LinkedIn remains inactive until its Partner ID is configured; its lead-conversion ID is separate.
+
+Microsoft Clarity uses `consentv2`: analytics storage defaults to denied and is granted only after a separate Clarity opt-in; Microsoft advertising storage is always denied. It sends no custom visitor identifiers and masks page text. Set project **Cookies off** (consent mode) and **Masking to Strict** before configuring `NEXT_PUBLIC_CLARITY_PROJECT_ID`. Use limited mode keeps cookieless Clarity measurement, while Turn off all tracking stops collection. Do Not Track and Global Privacy Control disable every tracker. Cookieless Clarity still sends behavioral data and masked recordings to Microsoft and is not an aggregate-only or universally consent-exempt service. The `/privacy` notice describes this collection. A development-only controls preview is available at `/preview/privacy` and returns 404 in production.
 
 ## Quality checks
 

@@ -86,6 +86,7 @@ jobs:
       # Public identifier; localhost is blocked from sending analytics.
       NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID: GTM-MN7VXD64
       NEXT_PUBLIC_META_PIXEL_ID: "2306932560092203"
+      NEXT_PUBLIC_CLARITY_PROJECT_ID: z41sv84gxl
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0

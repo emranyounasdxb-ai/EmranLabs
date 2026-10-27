@@ -88,7 +88,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body>
+      <body data-clarity-mask="true">
         <StructuredData />
         <WebVitals />
         {analytics && <GoogleTagManagerConsent config={analytics} />}

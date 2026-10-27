@@ -8,8 +8,10 @@ test("approved desktop surfaces", async ({ page }, info) => {
     "Stable visual baselines use Chromium; behavior runs in all engines.",
   );
   await openDesktop(page, "/?collection=All+Projects");
-  // Consent behavior has dedicated tests; keep desktop baselines consistent.
-  await page.getByRole("button", { name: "Decline", exact: true }).click();
+  // Privacy is available in Settings, leaving the desktop and dock unobstructed.
+  await expect(
+    page.getByRole("region", { name: "Privacy preferences" }),
+  ).toBeHidden();
   await expect(page.getByText("Clear sky")).toBeVisible();
   await expect(page).toHaveScreenshot("desktop-light.png");
   await page.getByRole("button", { name: "Edit", exact: true }).click();

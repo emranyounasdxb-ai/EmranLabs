@@ -44,6 +44,11 @@ export async function openDesktop(page: Page, path = "/") {
   await page.waitForFunction(
     () => !!localStorage.getItem("emranlabs-workspace-v2"),
   );
+  const privacy = page.getByRole("region", { name: "Privacy preferences" });
+  if (await privacy.isVisible())
+    await privacy
+      .getByRole("button", { name: "Use limited mode", exact: true })
+      .click();
 }
 export async function controlCenter(page: Page) {
   await page

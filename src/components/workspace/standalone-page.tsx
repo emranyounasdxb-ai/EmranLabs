@@ -8,6 +8,7 @@ export function StandalonePage({ children }: { children: ReactNode }) {
         <Link href="/about">About</Link>
         <Link href="/services">Services</Link>
         <Link href="/contact">Contact</Link>
+        <Link href="/privacy">Privacy</Link>
       </nav>
       {children}
     </main>

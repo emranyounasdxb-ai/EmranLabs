@@ -2,6 +2,10 @@
 
 export const analyticsConsentStorageKey = "emranlabs.analytics-consent";
 export const metaConsentStorageKey = "emranlabs.meta-consent";
+export const linkedInConsentStorageKey = "emranlabs.linkedin-consent";
+export const clarityPreferenceStorageKey = "emranlabs.clarity-disabled";
+export const clarityConsentStorageKey = "emranlabs.clarity-consent";
+export const privacyOpenEvent = "emranlabs:privacy-open";
 
 export type AnalyticsConsent = "granted" | "denied";
 export type GoogleTagManagerStatus = "idle" | "loading" | "loaded" | "failed";
@@ -63,6 +67,10 @@ export function isAnalyticsHostname(hostname: string) {
 }
 
 type AnalyticsWindow = Window & {
+  clarity?: ((...args: unknown[]) => void) & { q?: unknown[][] };
+  __emranLabsClarityStatus?: GoogleTagManagerStatus;
+  __emranLabsClarityDisabled?: boolean;
+  __emranLabsTrackingSuspended?: boolean;
   dataLayer?: Array<GtagConsentArguments | DataLayerEvent>;
   __emranLabsGtmStatus?: GoogleTagManagerStatus;
   __emranLabsGooglePage?: string;
@@ -70,6 +78,19 @@ type AnalyticsWindow = Window & {
   __emranLabsMetaPage?: string;
   fbq?: MetaPixelQueue;
   _fbq?: MetaPixelQueue;
+  _linkedin_partner_id?: string;
+  _linkedin_data_partner_ids?: string[];
+  __emranLabsLinkedInPartnerId?: string;
+  __emranLabsLinkedInLeadConversionId?: string;
+  __emranLabsLinkedInPage?: string;
+  lintrk?: LinkedInQueue;
+};
+
+type LinkedInQueue = ((
+  command: string,
+  options: Record<string, unknown>,
+) => void) & {
+  q: Array<[string, Record<string, unknown>]>;
 };
 
 type MetaPixelQueue = ((...args: unknown[]) => void) & {
@@ -82,39 +103,282 @@ type MetaPixelQueue = ((...args: unknown[]) => void) & {
 
 export function doNotTrackEnabled() {
   if (typeof navigator === "undefined") return false;
-  return navigator.doNotTrack === "1" || navigator.doNotTrack === "yes";
+  return (
+    navigator.doNotTrack === "1" ||
+    navigator.doNotTrack === "yes" ||
+    (navigator as Navigator & { globalPrivacyControl?: boolean })
+      .globalPrivacyControl === true
+  );
+}
+
+/** This is an opt-out preference, never a cookie-consent grant. */
+export function isClarityEnabled() {
+  try {
+    return (
+      !doNotTrackEnabled() &&
+      !getAnalyticsWindow().__emranLabsClarityDisabled &&
+      !getAnalyticsWindow().__emranLabsTrackingSuspended &&
+      window.sessionStorage?.getItem(suspendedKey) !== "1" &&
+      window.localStorage.getItem(clarityPreferenceStorageKey) !== "1"
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function storeClarityEnabled(enabled: boolean) {
+  const target = getAnalyticsWindow();
+  target.__emranLabsClarityDisabled = !enabled;
+  if (!enabled) stopClarity();
+  try {
+    window.localStorage.setItem(
+      clarityPreferenceStorageKey,
+      enabled ? "0" : "1",
+    );
+    return (
+      window.localStorage.getItem(clarityPreferenceStorageKey) ===
+      (enabled ? "0" : "1")
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function getStoredClarityConsent() {
+  return readConsent(clarityConsentStorageKey);
+}
+
+export function storeClarityConsent(consent: AnalyticsConsent) {
+  return writeConsent(clarityConsentStorageKey, consent);
+}
+
+export function updateClarityConsent() {
+  try {
+    const analytics =
+      isClarityEnabled() && getStoredClarityConsent() === "granted"
+        ? "granted"
+        : "denied";
+    getAnalyticsWindow().clarity?.("consentv2", {
+      analytics_Storage: analytics,
+      ad_Storage: "denied",
+    });
+    if (analytics === "denied") clearFirstPartyCookies(["_clck", "_clsk"]);
+  } catch {}
+}
+
+/** Project cookies must also be Off in Clarity Settings > Setup. */
+export function loadClarity(projectId?: string) {
+  if (
+    !projectId ||
+    !/^[a-z0-9]{6,20}$/.test(projectId) ||
+    !isClarityEnabled() ||
+    !isAnalyticsHostname(window.location.hostname)
+  )
+    return;
+  const target = getAnalyticsWindow();
+  if (target.clarity || document.getElementById("emranlabs-clarity")) return;
+  const queue = Object.assign(
+    (...args: unknown[]) => {
+      queue.q.push(args);
+    },
+    { q: [] as unknown[][] },
+  );
+  target.clarity = queue;
+  // Case-sensitive keys: analytics cookies need a separate Clarity opt-in.
+  // Microsoft advertising storage is never granted by this integration.
+  updateClarityConsent();
+  target.__emranLabsClarityStatus = "loading";
+  const script = document.createElement("script");
+  script.id = "emranlabs-clarity";
+  script.async = true;
+  script.src = `https://www.clarity.ms/tag/${projectId}`;
+  script.onload = () => {
+    target.__emranLabsClarityStatus = "loaded";
+  };
+  script.onerror = () => {
+    target.__emranLabsClarityStatus = "failed";
+    // Discard queued events if the tag is blocked. Do not grow a queue forever.
+    if (target.clarity === queue) delete target.clarity;
+    script.remove();
+  };
+  document.head.append(script);
+}
+
+export function stopClarity() {
+  try {
+    const target = getAnalyticsWindow();
+    target.clarity?.("stop");
+    target.__emranLabsClarityStatus = "idle";
+    clearFirstPartyCookies(["_clck", "_clsk"]);
+  } catch {}
+}
+
+function trackClarityEvent(event: AnalyticsEventName, safe: AnalyticsMetadata) {
+  const target = getAnalyticsWindow();
+  if (!isClarityEnabled() || target.__emranLabsClarityStatus !== "loaded")
+    return;
+  // Use only public catalog names. Never use identify(), free text or visitor IDs.
+  if (event === "application_opened" && safe.app)
+    target.clarity?.("event", `app_${safe.app}`);
+  if (event === "project_detail_opened" && safe.project)
+    target.clarity?.("event", `project_${safe.project}`);
+  if (event === "contact_channel_clicked" && safe.channel)
+    target.clarity?.("event", `contact_${safe.channel}`);
+  if (event === "generate_lead") target.clarity?.("event", "enquiry_sent");
+}
+
+export function getStoredLinkedInConsent(): AnalyticsConsent | null {
+  return readConsent(linkedInConsentStorageKey);
+}
+
+export function storeLinkedInConsent(consent: AnalyticsConsent) {
+  return writeConsent(linkedInConsentStorageKey, consent);
+}
+
+const suspendedKey = "emranlabs.tracking-suspended";
+
+function readConsent(key: string): AnalyticsConsent | null {
+  try {
+    if (
+      getAnalyticsWindow().__emranLabsTrackingSuspended ||
+      window.sessionStorage?.getItem(suspendedKey) === "1"
+    )
+      return "denied";
+    const value = window.localStorage.getItem(key);
+    return value === "granted" || value === "denied" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeConsent(key: string, consent: AnalyticsConsent) {
+  try {
+    window.localStorage.setItem(key, consent);
+    return window.localStorage.getItem(key) === consent;
+  } catch {
+    return false;
+  }
+}
+
+/** Failed preference writes must not reactivate a previously saved grant. */
+export function suspendTrackingForSession() {
+  getAnalyticsWindow().__emranLabsTrackingSuspended = true;
+  try {
+    window.sessionStorage.setItem(suspendedKey, "1");
+    return window.sessionStorage.getItem(suspendedKey) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function resumeTrackingAfterSavedChoice() {
+  try {
+    window.sessionStorage?.removeItem(suspendedKey);
+  } catch {}
+  getAnalyticsWindow().__emranLabsTrackingSuspended = false;
+}
+
+function linkedInAllowed() {
+  return (
+    !doNotTrackEnabled() &&
+    isAnalyticsHostname(window.location.hostname) &&
+    getStoredLinkedInConsent() === "granted"
+  );
+}
+
+/** LinkedIn's queue is installed only after an independent, explicit opt-in. */
+export function loadLinkedInInsight(
+  partnerId?: string,
+  leadConversionId?: string,
+) {
+  if (!partnerId || !/^[1-9]\d{0,14}$/.test(partnerId) || !linkedInAllowed())
+    return;
+  const target = getAnalyticsWindow();
+  if (target.__emranLabsLinkedInPartnerId) return;
+  if (target.lintrk) return;
+  const lintrk: LinkedInQueue = Object.assign(
+    (command: string, options: Record<string, unknown>) => {
+      lintrk.q.push([command, options]);
+    },
+    { q: [] as Array<[string, Record<string, unknown>]> },
+  );
+  target.lintrk = lintrk;
+  target._linkedin_partner_id = partnerId;
+  target._linkedin_data_partner_ids = [partnerId];
+  target.__emranLabsLinkedInPartnerId = partnerId;
+  target.__emranLabsLinkedInLeadConversionId =
+    leadConversionId && /^[1-9]\d{0,14}$/.test(leadConversionId)
+      ? leadConversionId
+      : undefined;
+  // The SDK owns the initial page view; explicit calls cover subsequent routes.
+  target.__emranLabsLinkedInPage = window.location.pathname;
+  const script = document.createElement("script");
+  script.id = "emranlabs-linkedin-insight";
+  script.async = true;
+  script.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+  document.head.append(script);
+}
+
+export function trackLinkedInPageView() {
+  try {
+    const target = getAnalyticsWindow();
+    if (
+      !linkedInAllowed() ||
+      !target.__emranLabsLinkedInPartnerId ||
+      target.__emranLabsLinkedInPage === window.location.pathname
+    )
+      return;
+    target.__emranLabsLinkedInPage = window.location.pathname;
+    target.lintrk?.("track", {});
+  } catch {}
+}
+
+function clearFirstPartyCookies(names: string[]) {
+  for (const name of names) {
+    for (const domain of [
+      "",
+      `; Domain=${window.location.hostname}`,
+      "; Domain=.emranlabs.com",
+    ]) {
+      document.cookie = `${name}=; Max-Age=0; Path=/${domain}; SameSite=Lax`;
+    }
+  }
+}
+
+export function revokeLinkedInInsight() {
+  try {
+    // Reload by the consent controller discards the SDK; third-party cookies
+    // belong to LinkedIn and cannot be removed by this website.
+    clearFirstPartyCookies(["li_fat_id", "li_giant"]);
+  } catch {}
+}
+
+export function clearGoogleAnalyticsCookies() {
+  try {
+    const names = document.cookie
+      .split(";")
+      .map((cookie) => cookie.trim().split("=")[0])
+      .filter((name) =>
+        /^(_ga(?:_|$)|_gid$|_gat(?:_|$)|_gac_|_gcl_)/.test(name),
+      );
+    clearFirstPartyCookies(names);
+  } catch {}
 }
 
 export function getStoredAnalyticsConsent(): AnalyticsConsent | null {
-  try {
-    const value = window.localStorage.getItem(analyticsConsentStorageKey);
-    return value === "granted" || value === "denied" ? value : null;
-  } catch {
-    return null;
-  }
+  return readConsent(analyticsConsentStorageKey);
 }
 
 export function storeAnalyticsConsent(consent: AnalyticsConsent) {
-  try {
-    window.localStorage.setItem(analyticsConsentStorageKey, consent);
-  } catch {
-    // Consent storage failure should not break the desktop UI.
-  }
+  return writeConsent(analyticsConsentStorageKey, consent);
 }
 
 export function getStoredMetaConsent(): AnalyticsConsent | null {
-  try {
-    const value = window.localStorage.getItem(metaConsentStorageKey);
-    return value === "granted" || value === "denied" ? value : null;
-  } catch {
-    return null;
-  }
+  return readConsent(metaConsentStorageKey);
 }
 
 export function storeMetaConsent(consent: AnalyticsConsent) {
-  try {
-    window.localStorage.setItem(metaConsentStorageKey, consent);
-  } catch {}
+  return writeConsent(metaConsentStorageKey, consent);
 }
 
 function metaAllowed() {
@@ -356,7 +620,19 @@ export function trackEvent(
       )
         safe.rating = metadata.rating;
     }
+    trackClarityEvent(event, safe);
     trackMetaEvent(event, safe);
+    if (
+      event === "generate_lead" &&
+      linkedInAllowed() &&
+      analyticsWindow.__emranLabsLinkedInLeadConversionId
+    ) {
+      analyticsWindow.lintrk?.("track", {
+        conversion_id: Number(
+          analyticsWindow.__emranLabsLinkedInLeadConversionId,
+        ),
+      });
+    }
     if (
       getStoredAnalyticsConsent() !== "granted" ||
       analyticsWindow.__emranLabsGtmStatus !== "loaded" ||

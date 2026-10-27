@@ -109,36 +109,38 @@ test("separate consent choices persist and local previews never load tracking ta
     page.getByRole("heading", { name: "Privacy preferences" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("checkbox", { name: /Meta measurement/ }),
+    page.getByRole("checkbox", { name: /Meta Pixel/ }),
   ).not.toBeChecked();
   await page.getByRole("checkbox", { name: /Google Analytics/ }).check();
   await page.getByRole("button", { name: "Save choices", exact: true }).click();
   await page.reload();
   await expect(
     page.getByRole("button", {
-      name: "Privacy preferences, analytics granted, Meta denied",
+      name: "Privacy preferences, Google granted, Meta denied, LinkedIn denied",
     }),
   ).toBeVisible();
   await expect(page.locator('script[src*="googletagmanager"]')).toHaveCount(0);
   await page
     .getByRole("button", {
-      name: "Privacy preferences, analytics granted, Meta denied",
+      name: "Privacy preferences, Google granted, Meta denied, LinkedIn denied",
     })
     .click();
   await page.getByRole("checkbox", { name: /Google Analytics/ }).uncheck();
-  await page.getByRole("checkbox", { name: /Meta measurement/ }).check();
+  await page.getByRole("checkbox", { name: /Meta Pixel/ }).check();
   await page.getByRole("button", { name: "Save choices", exact: true }).click();
   await page.reload();
   await page
     .getByRole("button", {
-      name: "Privacy preferences, analytics denied, Meta granted",
+      name: "Privacy preferences, Google denied, Meta granted, LinkedIn denied",
     })
     .click();
-  await page.getByRole("button", { name: "Decline", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Use limited mode", exact: true })
+    .click();
   await page.reload();
   await expect(
     page.getByRole("button", {
-      name: "Privacy preferences, analytics denied, Meta denied",
+      name: "Privacy preferences, Google denied, Meta denied, LinkedIn denied",
     }),
   ).toBeVisible();
   await expect(page.locator('script[src*="facebook"]')).toHaveCount(0);

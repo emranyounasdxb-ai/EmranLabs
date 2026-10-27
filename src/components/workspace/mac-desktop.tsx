@@ -1766,6 +1766,29 @@ export function MacDesktop() {
                         <section className="settings-content">
                           <span className="eyebrow">MAKE YOURSELF AT HOME</span>
                           <h1>Your workspace, your way.</h1>
+                          <fieldset className="dock-settings">
+                            <legend>Privacy</legend>
+                            <p className="setting-hint">
+                              Manage analytics cookies, limited cookieless
+                              measurement and campaign tools. Your choice stays
+                              saved in this browser.
+                            </p>
+                            <button
+                              className="secondary-button"
+                              onClick={(event) =>
+                                window.dispatchEvent(
+                                  new CustomEvent("emranlabs:privacy-open", {
+                                    detail: event.currentTarget,
+                                  }),
+                                )
+                              }
+                            >
+                              Privacy preferences
+                            </button>
+                            <a className="secondary-button" href="/privacy">
+                              Privacy notice
+                            </a>
+                          </fieldset>
                           <div
                             className="appearance-options"
                             role="group"
