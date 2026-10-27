@@ -257,6 +257,20 @@ test("motion status follows local and system preferences and dark surfaces remai
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await appearance(page, "dark");
   await page.locator('[data-dock-tool="figma"]').click();
+  // Contrast applies to the settled surface, not a frame of its opening fade.
+  await page
+    .locator('[data-window-app="projects"]')
+    .evaluate(async (element) => {
+      await Promise.all(
+        element
+          .getAnimations({ subtree: true })
+          .filter(
+            (animation) =>
+              animation.effect?.getTiming().iterations !== Infinity,
+          )
+          .map((animation) => animation.finished.catch(() => undefined)),
+      );
+    });
   expect(
     (
       await new AxeBuilder({ page })

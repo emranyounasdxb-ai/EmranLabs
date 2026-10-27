@@ -53,6 +53,12 @@ done
 for route in /contact /services /projects/edrive /robots.txt /sitemap.xml; do
   curl --fail --silent "http://127.0.0.1:3087$route" > /dev/null
 done
+# Empty input must reach validation (400), not fail the production origin guard.
+# This checks the reverse-proxy setup without sending an enquiry email.
+CONTACT_STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+  --header 'Origin: https://emranlabs.com' --header 'Content-Type: application/json' \
+  --data '{}' http://127.0.0.1:3087/api/contact)
+[[ "$CONTACT_STATUS" == 400 ]]
 kill "$SMOKE_PID"
 wait "$SMOKE_PID" 2>/dev/null || true
 trap - EXIT
