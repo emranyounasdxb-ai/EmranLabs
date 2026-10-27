@@ -193,6 +193,8 @@ test("screenshot viewer supports zoom, navigation, Escape and mobile sizing", as
   page,
 }) => {
   await page.goto("/projects/edrive");
+  // A new visitor can dismiss the first-visit privacy card without granting consent.
+  await page.getByRole("button", { name: "Close privacy preferences" }).click();
   const trigger = page.getByRole("button", {
     name: "Enlarge: eDrive website screenshot",
     exact: true,
