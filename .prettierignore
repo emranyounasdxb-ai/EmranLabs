@@ -1,0 +1,20 @@
+node_modules
+.next
+.next-dev
+.tools
+out
+build
+dist
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+next-env.d.ts
+
+# Generated previews and vendored source licenses retain their source format.
+docs/email/email-confirmation.html
+docs/email/form-confirmation.html
+docs/email/assets/source/*LICENSE*
+
+# Generated world-map vector data; keep compact for bundle size.
+src/data/world-map-path.ts

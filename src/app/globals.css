@@ -1,0 +1,288 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+:root {
+  --font-space-grotesk: var(--font-body), "Segoe UI", Arial, sans-serif;
+  --font-jetbrains-mono:
+    var(--font-mono), "SFMono-Regular", Consolas, monospace;
+}
+
+@theme inline {
+  --color-background: var(--background-primary);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--background-primary);
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: rgba(23, 227, 192, 0.28);
+  color: var(--color-fog);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.desktop-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at center, rgba(23, 227, 192, 0.12), transparent 48%);
+  background-position:
+    calc(var(--desktop-depth-x, 0px) * -0.22)
+      calc(var(--desktop-depth-y, 0px) * -0.22),
+    calc(var(--desktop-depth-x, 0px) * -0.22)
+      calc(var(--desktop-depth-y, 0px) * -0.22),
+    center;
+  background-size:
+    48px 48px,
+    48px 48px,
+    100% 100%;
+  mask-image: radial-gradient(circle at 50% 42%, black, transparent 76%);
+}
+
+.desktop-atmosphere {
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      rgba(23, 227, 192, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 72% 48%,
+      rgba(123, 92, 255, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(
+      115deg,
+      transparent 8%,
+      rgba(255, 255, 255, 0.04) 42%,
+      transparent 68%
+    );
+  filter: blur(8px);
+  transform: translate3d(
+    calc(var(--desktop-depth-x, 0px) * 0.16),
+    calc(var(--desktop-depth-y, 0px) * 0.16),
+    0
+  );
+}
+
+.desktop-scanline {
+  background-image: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 100% 9rem;
+}
+
+.video-water-drops {
+  isolation: isolate;
+  opacity: 0.82;
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    black 7%,
+    black 94%,
+    transparent 100%
+  );
+}
+
+.video-condensation {
+  background-image:
+    radial-gradient(
+      ellipse at 24% 32%,
+      rgba(255, 255, 255, 0.2) 0 0.7px,
+      rgba(173, 222, 242, 0.09) 1px,
+      transparent 2.3px
+    ),
+    radial-gradient(
+      ellipse at 72% 64%,
+      rgba(255, 255, 255, 0.15) 0 0.6px,
+      rgba(121, 184, 212, 0.07) 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      ellipse at 45% 78%,
+      rgba(255, 255, 255, 0.12) 0 0.5px,
+      transparent 1.8px
+    );
+  background-position:
+    0 0,
+    34px 22px,
+    68px 48px;
+  background-size:
+    120px 96px,
+    156px 128px,
+    104px 86px;
+  mix-blend-mode: screen;
+  opacity: 0.2;
+}
+
+.video-water-drop {
+  position: absolute;
+  top: -18vh;
+  left: var(--drop-left);
+  width: var(--drop-size);
+  height: var(--drop-size);
+  border: 1px solid rgba(218, 242, 255, 0.13);
+  border-radius: 62% 54% 68% 59% / 54% 57% 72% 68%;
+  background:
+    radial-gradient(
+      circle at 31% 22%,
+      rgba(255, 255, 255, 0.58) 0 6%,
+      rgba(255, 255, 255, 0.16) 12%,
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 67% 72%,
+      rgba(0, 10, 24, 0.22),
+      rgba(126, 193, 219, 0.07) 44%,
+      rgba(255, 255, 255, 0.05) 70%,
+      rgba(255, 255, 255, 0.14) 100%
+    );
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.28),
+    inset -2px -3px 4px rgba(0, 5, 14, 0.22),
+    0 2px 5px rgba(0, 0, 0, 0.14);
+  opacity: 0;
+  backdrop-filter: blur(0.7px) saturate(1.12);
+  will-change: transform, opacity;
+  animation: video-water-drop-slide var(--drop-duration) linear infinite;
+  animation-delay: var(--drop-delay);
+}
+
+.video-water-drop::before {
+  position: absolute;
+  bottom: 78%;
+  left: 50%;
+  width: 1px;
+  height: 34px;
+  content: "";
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(188, 226, 243, 0.06) 54%,
+    rgba(235, 249, 255, 0.16)
+  );
+  transform: translateX(-50%);
+}
+
+.video-water-drop::after {
+  position: absolute;
+  top: 21%;
+  left: 24%;
+  width: 22%;
+  height: 22%;
+  border-radius: 999px;
+  content: "";
+  background: rgba(255, 255, 255, 0.42);
+  filter: blur(0.4px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .desktop-atmosphere {
+    animation: desktop-atmosphere-drift 18s var(--motion-ease) infinite
+      alternate;
+  }
+
+  .desktop-scanline {
+    animation: desktop-scanline-drift 16s linear infinite;
+  }
+}
+
+@keyframes desktop-atmosphere-drift {
+  from {
+    opacity: 0.68;
+  }
+  to {
+    opacity: 0.88;
+  }
+}
+
+@keyframes desktop-scanline-drift {
+  from {
+    background-position-y: 0;
+  }
+  to {
+    background-position-y: 9rem;
+  }
+}
+
+@keyframes video-water-drop-slide {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -18vh, 0) rotate(7deg) scale(0.82);
+  }
+  9% {
+    opacity: var(--drop-opacity);
+  }
+  82% {
+    opacity: var(--drop-opacity);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drop-drift), 132vh, 0) rotate(12deg)
+      scale(1.08);
+  }
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 999;
+  transform: translateY(-160%);
+  border-radius: 999px;
+  background: var(--color-signal);
+  color: #020304;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+@media (max-width: 767px) {
+  .desktop-atmosphere {
+    filter: blur(3px);
+  }
+  .desktop-scanline {
+    display: none;
+  }
+}

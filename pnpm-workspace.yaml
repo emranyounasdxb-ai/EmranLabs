@@ -1,0 +1,31 @@
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - openai@7.44.0
+  - "@typescript-eslint/eslint-plugin@8.72.1"
+  - "@typescript-eslint/parser@8.72.1"
+  - "@typescript-eslint/project-service@8.72.1"
+  - "@typescript-eslint/scope-manager@8.72.1"
+  - "@typescript-eslint/tsconfig-utils@8.72.1"
+  - "@typescript-eslint/type-utils@8.72.1"
+  - "@typescript-eslint/types@8.72.1"
+  - "@typescript-eslint/typescript-estree@8.72.1"
+  - "@typescript-eslint/utils@8.72.1"
+  - "@typescript-eslint/visitor-keys@8.72.1"
+  - typescript-eslint@8.72.1
+
+# The app and its checks use TypeScript 7. ESLint's latest parser still needs
+# Microsoft's JavaScript compiler API compatibility package (TS 6).
+overrides:
+  typescript-eslint: 8.72.1
+
+# Next 16.4 wraps these plugins with its ESLint 10 rule-context adapter.
+# Their own published peer ranges have not caught up with that adapter yet.
+peerDependencyRules:
+  allowedVersions:
+    "eslint-plugin-import>eslint": "10.13.0"
+    "eslint-plugin-jsx-a11y>eslint": "10.13.0"
+    "eslint-plugin-react>eslint": "10.13.0"
+
+# .pnpmfile.cjs supplies the compiler API only to these lint packages.

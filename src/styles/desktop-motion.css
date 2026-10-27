@@ -1,0 +1,161 @@
+/* Shared desktop motion. Transforms/opacity keep reveals off the layout path. */
+.finder-content {
+  animation-duration: 280ms;
+}
+.projects-grid > .project-folder {
+  animation: project-arrive 320ms var(--ease-desktop) backwards;
+}
+.projects-grid > .project-folder:nth-child(2) {
+  animation-delay: 35ms;
+}
+.projects-grid > .project-folder:nth-child(3) {
+  animation-delay: 70ms;
+}
+.project-folder-art,
+.folder-contact-sheet,
+.social-icon > .app-icon,
+.mission-preview {
+  transition:
+    transform 240ms var(--ease-desktop),
+    box-shadow 240ms;
+}
+.finder-sidebar > button > .app-icon {
+  transition: transform 180ms var(--ease-desktop);
+}
+.finder-window.interacting {
+  transition: none;
+}
+.desktop-widget {
+  animation: widget-reveal 440ms var(--ease-desktop) backwards;
+  transition:
+    transform 280ms var(--ease-desktop),
+    box-shadow 180ms;
+}
+.widget-calendar {
+  animation-delay: 45ms;
+}
+.widget-weather {
+  animation-delay: 90ms;
+}
+.system-dialog[open],
+.spotlight[open],
+.quick-look[open] {
+  animation: popover-in 260ms var(--ease-desktop) both;
+}
+.control-center,
+.calendar-popover {
+  transform-origin: top right;
+}
+.system-dialog[open]::backdrop,
+.spotlight[open]::backdrop,
+.quick-look[open]::backdrop {
+  animation: backdrop-in 200ms ease-out both;
+}
+.desktop-popover {
+  animation-duration: 180ms;
+}
+.system-dialog[open][data-closing],
+.spotlight[open][data-closing],
+.quick-look[open][data-closing] {
+  animation: dialog-leave 180ms ease-in both;
+  pointer-events: none;
+}
+.system-dialog[open][data-closing]::backdrop,
+.spotlight[open][data-closing]::backdrop,
+.quick-look[open][data-closing]::backdrop {
+  animation: backdrop-in 180ms ease-in reverse both;
+}
+@keyframes dialog-leave {
+  from {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    translate: 0 6px;
+    scale: 0.98;
+  }
+}
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes project-arrive {
+  from {
+    opacity: 0;
+    translate: 0 9px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes widget-reveal {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .mac-desktop:not(.calm) .project-folder:hover .project-folder-art {
+    transform: translateY(-3px) scale(1.025);
+  }
+  .mac-desktop:not(.calm) .project-folder:hover .folder-contact-sheet {
+    transform: rotate(-3deg) translateY(-2px);
+  }
+  .mac-desktop:not(.calm) .social-icon:hover > .app-icon,
+  .mac-desktop:not(.calm) .mission-card:hover .mission-preview {
+    transform: translateY(-3px);
+  }
+  .mac-desktop:not(.calm) .finder-sidebar > button:hover > .app-icon {
+    transform: scale(1.08);
+  }
+}
+.calm
+  :is(
+    .finder-content,
+    .project-folder,
+    .desktop-widget,
+    .system-dialog[open],
+    .spotlight[open],
+    .quick-look[open],
+    .desktop-popover
+  ),
+.calm dialog::backdrop {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .finder-content,
+    .project-folder,
+    .desktop-widget,
+    .system-dialog[open],
+    .spotlight[open],
+    .quick-look[open],
+    .desktop-popover
+  ),
+  dialog::backdrop {
+    animation: none !important;
+  }
+}

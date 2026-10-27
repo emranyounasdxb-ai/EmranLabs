@@ -1,0 +1,138 @@
+{
+  "checkedAt": "2026-10-26T19:36:15.352Z",
+  "node": "v24.22.1",
+  "packageManager": "pnpm@12.15.0",
+  "packages": [
+    {
+      "name": "class-variance-authority",
+      "before": "0.7.1",
+      "installed": "0.7.1"
+    },
+    {
+      "name": "clsx",
+      "before": "2.1.1",
+      "installed": "2.1.1"
+    },
+    {
+      "name": "framer-motion",
+      "before": "12.42.2",
+      "installed": "14.6.0"
+    },
+    {
+      "name": "lucide-react",
+      "before": "1.24.0",
+      "installed": "1.61.0"
+    },
+    {
+      "name": "next",
+      "before": "16.2.10",
+      "installed": "16.4.3"
+    },
+    {
+      "name": "nodemailer",
+      "before": "9.0.3",
+      "installed": "10.2.1"
+    },
+    {
+      "name": "openai",
+      "before": "6.46.0",
+      "installed": "7.44.0"
+    },
+    {
+      "name": "react",
+      "before": "19.2.7",
+      "installed": "19.3.1"
+    },
+    {
+      "name": "react-dom",
+      "before": "19.2.7",
+      "installed": "19.3.1"
+    },
+    {
+      "name": "tailwind-merge",
+      "before": "3.6.0",
+      "installed": "3.7.0"
+    },
+    {
+      "name": "zod",
+      "before": "4.4.3",
+      "installed": "4.6.7"
+    },
+    {
+      "name": "zustand",
+      "before": "5.0.14",
+      "installed": "5.0.16"
+    },
+    {
+      "name": "sharp",
+      "before": "0.34.5",
+      "installed": "0.35.5"
+    },
+    {
+      "name": "@eslint/eslintrc",
+      "before": "3.3.5",
+      "installed": "3.3.7"
+    },
+    {
+      "name": "@tailwindcss/postcss",
+      "before": "4.3.2",
+      "installed": "4.3.3"
+    },
+    {
+      "name": "@types/node",
+      "before": "22.20.1",
+      "installed": "24.19.2"
+    },
+    {
+      "name": "@types/nodemailer",
+      "before": "8.0.1",
+      "installed": "8.0.2"
+    },
+    {
+      "name": "@types/react",
+      "before": "19.2.17",
+      "installed": "19.3.0"
+    },
+    {
+      "name": "@types/react-dom",
+      "before": "19.2.3",
+      "installed": "19.3.0"
+    },
+    {
+      "name": "eslint",
+      "before": "9.39.4",
+      "installed": "10.13.0"
+    },
+    {
+      "name": "eslint-config-next",
+      "before": "16.2.10",
+      "installed": "16.4.3"
+    },
+    {
+      "name": "prettier",
+      "before": "3.9.5",
+      "installed": "3.9.10"
+    },
+    {
+      "name": "prettier-plugin-tailwindcss",
+      "before": "0.8.0",
+      "installed": "0.8.1"
+    },
+    {
+      "name": "tailwindcss",
+      "before": "4.3.2",
+      "installed": "4.3.3"
+    },
+    {
+      "name": "typescript",
+      "before": "5.9.3",
+      "installed": "7.0.2"
+    },
+    {
+      "name": "corepack",
+      "before": "0.34.6",
+      "installed": "0.36.0"
+    }
+  ],
+  "lintCompatibility": "@typescript/typescript6 6.0.2, compiler API 6.0.3; lint tooling only"
+}

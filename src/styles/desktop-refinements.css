@@ -1,0 +1,458 @@
+/* Shared readable surfaces: final layer for desktop controls and overlays. */
+.mac-desktop {
+  --overlay-paper: #f4f6f9f5;
+  --overlay-ink: #243140;
+  --overlay-muted: #536171;
+  --overlay-line: #25385026;
+  --overlay-selection: #d8eafa;
+  --overlay-input: #ffffffbd;
+  --muted: #56616e;
+  color-scheme: light;
+}
+.mac-desktop.dark {
+  --overlay-paper: #242a33f5;
+  --overlay-ink: #f2f5fa;
+  --overlay-muted: #b7c3d3;
+  --overlay-line: #ffffff29;
+  --overlay-selection: #244b70;
+  --overlay-input: #131a2580;
+  --muted: #b7c3d3;
+  color-scheme: dark;
+}
+.mac-desktop .spotlight,
+.mac-desktop .launchpad {
+  background: var(--overlay-paper);
+  color: var(--overlay-ink);
+  border: 1px solid var(--overlay-line);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  backdrop-filter: blur(24px) saturate(1.3);
+}
+.spotlight-search,
+.spotlight-footer {
+  border-color: var(--overlay-line);
+}
+.mac-desktop .spotlight-search input {
+  color: var(--overlay-ink);
+}
+.spotlight-search input::placeholder {
+  color: var(--overlay-muted);
+  opacity: 1;
+}
+.mac-desktop .spotlight-results small,
+.mac-desktop .spotlight-footer,
+.mac-desktop .spotlight-search > svg,
+.mac-desktop .spotlight-results button > svg,
+.mac-desktop .spotlight .sidebar-label,
+.mac-desktop .no-results {
+  color: var(--overlay-muted);
+}
+.mac-desktop .spotlight-results > button[aria-selected="true"] {
+  background: var(--overlay-selection);
+}
+.spotlight-results {
+  scrollbar-color: #71829780 transparent;
+  scrollbar-width: thin;
+}
+.spotlight-search:focus-within {
+  box-shadow: inset 0 -2px #1684df;
+}
+.opaque .spotlight,
+.opaque .launchpad {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: #f4f6f9;
+}
+.opaque.dark .spotlight,
+.opaque.dark .launchpad {
+  background: #242a33;
+}
+.mac-desktop :is(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid #0072d9;
+  outline-offset: 3px;
+}
+.mac-desktop.dark :is(button, a, input, select, textarea):focus-visible {
+  outline-color: #8dccff;
+}
+.spotlight-results > button:focus-visible {
+  outline-offset: -3px;
+}
+.appearance-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.system-preview {
+  background: linear-gradient(90deg, #eaf2fb 50%, #27374e 50%);
+}
+.appearance-mode-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+  font-size: 12px;
+}
+.appearance-mode-select select {
+  padding: 6px 10px;
+  border: 1px solid var(--overlay-line);
+  border-radius: 7px;
+  background: var(--overlay-input);
+  color: inherit;
+}
+.setting-hint,
+.dock-settings small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.dock-settings {
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-width: 0;
+}
+.dock-settings legend {
+  padding: 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.dock-settings .setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.dock-settings .setting-row span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dock-settings strong {
+  font-size: 13px;
+}
+.dock-settings input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #0072d9;
+}
+.dock-size-control {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+.dock-size-control > span {
+  display: flex;
+  justify-content: space-between;
+}
+.dock-size-control input {
+  width: 100%;
+  accent-color: #0072d9;
+}
+.dock-reveal-zone {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 85px;
+  z-index: 60;
+  pointer-events: none;
+}
+.dock-reveal-zone .dock {
+  pointer-events: auto;
+  bottom: 18px;
+  height: calc(var(--dock-size) + 19px);
+  --dock-size: min(
+    var(--preferred-dock-size, 35px),
+    clamp(29px, calc(6.6vw - 21.23px), 35px)
+  );
+  transition: translate 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (min-width: 1001px) {
+  .dock-reveal-zone .dock {
+    --dock-size: var(--preferred-dock-size, 35px);
+  }
+}
+.dock-reveal-zone .dock-item,
+.dock-reveal-zone .dock-item > .app-icon {
+  width: var(--dock-size);
+  height: var(--dock-size);
+}
+.dock-reveal-zone .dock-item > .app-icon {
+  will-change: auto;
+}
+.dock-reveal-zone .dock[data-moving] .app-icon {
+  will-change: transform;
+}
+.dock-auto-hide {
+  pointer-events: auto;
+  height: 12px;
+}
+.dock-auto-hide .dock {
+  translate: 0 calc(100% + 22px);
+}
+.dock-auto-hide:hover,
+.dock-auto-hide:focus-within {
+  height: 85px;
+}
+.dock-auto-hide:hover .dock,
+.dock-auto-hide:focus-within .dock {
+  translate: 0 0;
+}
+@media (hover: none) {
+  .dock-auto-hide .dock {
+    translate: none;
+  }
+}
+.launchpad {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(840px, calc(100vw - 40px));
+  padding: 26px;
+  max-height: calc(100dvh - 64px);
+}
+.launchpad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.launchpad h2 {
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  margin-top: 5px;
+}
+.launchpad-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  border: 1px solid var(--overlay-line);
+  border-radius: 12px;
+  background: var(--overlay-input);
+}
+.launchpad-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 15px;
+  padding: 2px;
+}
+.launchpad-search input::placeholder {
+  color: var(--overlay-muted);
+  opacity: 1;
+}
+.launchpad-content {
+  max-height: min(58dvh, 600px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 4px;
+  margin: 0 -4px;
+}
+.launchpad-content section {
+  margin-top: 22px;
+}
+.launchpad h3 {
+  font-size: 12px;
+  color: var(--overlay-muted);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.launchpad-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.launchpad-grid > :is(button, a) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 12px 6px;
+  border-radius: 12px;
+  min-height: 100px;
+  color: inherit;
+  text-decoration: none;
+}
+.launchpad-grid > :is(button, a):hover {
+  background: var(--overlay-selection);
+}
+.launchpad-grid .app-icon {
+  width: 46px;
+  height: 46px;
+  transition: transform 0.16s ease;
+}
+.launchpad-grid > :is(button, a):hover .app-icon {
+  transform: translateY(-2px);
+}
+.launchpad-grid > :is(button, a) > span:last-child {
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.launchpad footer {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--overlay-line);
+  font-size: 11px;
+  color: var(--overlay-muted);
+}
+.mission-collection > p {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px;
+  font-size: 11px;
+}
+.mission-collection .mission-folders {
+  padding-top: 8px;
+}
+.mission-list .mission-folders {
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+  gap: 5px;
+}
+.mission-list .mission-folders > div {
+  width: 100%;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.mission-list .mission-folders img {
+  width: 45px;
+  height: 27px;
+  object-fit: cover;
+}
+.mission-project-detail {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+}
+.mission-project-detail img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 5px;
+}
+.mission-calendar {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.mission-calendar .app-icon {
+  width: 58px;
+  height: 58px;
+}
+.mission-wallpaper {
+  position: relative;
+  height: 175px;
+}
+.mission-wallpaper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mission-wallpaper span {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  color: white;
+  background: #132139cc;
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-size: 11px;
+}
+.mission-empty-collection {
+  color: var(--muted);
+}
+.mission-preview {
+  overflow: hidden;
+}
+@media (max-width: 760px) {
+  .mac-desktop {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+  .mac-desktop .managed-window {
+    height: calc(100dvh - 118px) !important;
+  }
+  .dock-reveal-zone {
+    display: none;
+  }
+  .launchpad {
+    padding: 18px;
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+  .launchpad-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .launchpad-content {
+    max-height: calc(100dvh - 240px);
+  }
+  .launchpad-search input {
+    font-size: 16px;
+  }
+  .spotlight {
+    top: max(12px, 8dvh);
+    max-height: calc(100dvh - 24px);
+  }
+  .spotlight-results {
+    max-height: calc(100dvh - 170px);
+  }
+  .spotlight-search input {
+    font-size: 16px;
+  }
+  .appearance-options {
+    gap: 8px;
+  }
+  .settings-content {
+    padding: 20px 16px;
+  }
+}
+@media (max-height: 520px) {
+  .system-dialog {
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+  }
+  .spotlight {
+    top: 12px;
+    max-height: calc(100dvh - 24px);
+  }
+  .spotlight-results {
+    max-height: calc(100dvh - 160px);
+  }
+}
+@media (prefers-contrast: more) {
+  .mac-desktop {
+    --overlay-paper: #fff;
+    --overlay-ink: #101820;
+    --overlay-muted: #35404c;
+    --overlay-line: #536171;
+  }
+  .mac-desktop.dark {
+    --overlay-paper: #171c23;
+    --overlay-ink: #fff;
+    --overlay-muted: #d8e1ec;
+    --overlay-line: #a5b4c6;
+  }
+}

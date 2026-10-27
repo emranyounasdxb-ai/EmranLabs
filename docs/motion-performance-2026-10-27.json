@@ -1,0 +1,287 @@
+{
+  "cpuSlowdown": 4,
+  "frames": 226,
+  "medianFrameMs": 33.19999999999891,
+  "p95FrameMs": 100.10000000000036,
+  "maxEventMs": 632,
+  "longAnimationFrames": 43,
+  "maxLongFrameMs": 344.10000014305115,
+  "slowLongFrames": [
+    {
+      "name": "long-animation-frame",
+      "duration": 344.10000014305115,
+      "phase": "spotlight",
+      "timing": {
+        "name": "long-animation-frame",
+        "entryType": "long-animation-frame",
+        "startTime": 11513.299999952316,
+        "duration": 344.10000014305115,
+        "navigationId": 2783,
+        "paintTime": 11857.400000095367,
+        "presentationTime": 12100,
+        "renderStart": 11812.799999952316,
+        "styleAndLayoutStart": 11819.299999952316,
+        "firstUIEventTimestamp": 11468.099999904633,
+        "blockingDuration": 292.5,
+        "scripts": [
+          {
+            "name": "script",
+            "entryType": "script",
+            "startTime": 11533.900000095367,
+            "duration": 267.5,
+            "navigationId": 2783,
+            "invoker": "#document.onclick",
+            "invokerType": "event-listener",
+            "windowAttribution": "self",
+            "executionStart": 11533.900000095367,
+            "forcedStyleAndLayoutDuration": 168.9,
+            "pauseDuration": 0,
+            "sourceURL": "http://127.0.0.1:3000/_next/static/chunks/1nvekp7ernx_k.js",
+            "sourceFunctionName": "fQ",
+            "sourceCharPosition": 213817
+          }
+        ]
+      }
+    },
+    {
+      "name": "long-animation-frame",
+      "duration": 340.69999980926514,
+      "phase": "spotlight",
+      "timing": {
+        "name": "long-animation-frame",
+        "entryType": "long-animation-frame",
+        "startTime": 10957.900000095367,
+        "duration": 340.69999980926514,
+        "navigationId": 2783,
+        "paintTime": 11298.599999904633,
+        "presentationTime": 11352,
+        "renderStart": 11257.5,
+        "styleAndLayoutStart": 11297,
+        "firstUIEventTimestamp": 0,
+        "blockingDuration": 8.3,
+        "scripts": [
+          {
+            "name": "script",
+            "entryType": "script",
+            "startTime": 10977.5,
+            "duration": 5.400000095367432,
+            "navigationId": 2783,
+            "invoker": "MessagePort.onmessage",
+            "invokerType": "event-listener",
+            "windowAttribution": "self",
+            "executionStart": 10977.5,
+            "forcedStyleAndLayoutDuration": 0,
+            "pauseDuration": 0,
+            "sourceURL": "http://127.0.0.1:3000/_next/static/chunks/1nvekp7ernx_k.js",
+            "sourceFunctionName": "z",
+            "sourceCharPosition": 225002
+          }
+        ]
+      }
+    },
+    {
+      "name": "long-animation-frame",
+      "duration": 262.5,
+      "phase": "drag",
+      "timing": {
+        "name": "long-animation-frame",
+        "entryType": "long-animation-frame",
+        "startTime": 7090.700000047684,
+        "duration": 262.5,
+        "navigationId": 2769,
+        "paintTime": 7353.200000047684,
+        "presentationTime": 7616,
+        "renderStart": 7311.599999904633,
+        "styleAndLayoutStart": 7316.700000047684,
+        "firstUIEventTimestamp": 7089.5,
+        "blockingDuration": 211.2,
+        "scripts": [
+          {
+            "name": "script",
+            "entryType": "script",
+            "startTime": 7143.299999952316,
+            "duration": 97,
+            "navigationId": 2769,
+            "invoker": "#document.onclick",
+            "invokerType": "event-listener",
+            "windowAttribution": "self",
+            "executionStart": 7143.299999952316,
+            "forcedStyleAndLayoutDuration": 0,
+            "pauseDuration": 0,
+            "sourceURL": "http://127.0.0.1:3000/_next/static/chunks/1nvekp7ernx_k.js",
+            "sourceFunctionName": "fQ",
+            "sourceCharPosition": 213817
+          }
+        ]
+      }
+    }
+  ],
+  "slowest": [
+    {
+      "name": "pointerout",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerout",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11518.099999904633,
+        "processingEnd": 11519.400000095367,
+        "cancelable": true
+      }
+    },
+    {
+      "name": "pointerleave",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerleave",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11519.400000095367,
+        "processingEnd": 11519.400000095367,
+        "cancelable": false
+      }
+    },
+    {
+      "name": "pointerleave",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerleave",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11519.400000095367,
+        "processingEnd": 11519.400000095367,
+        "cancelable": false
+      }
+    },
+    {
+      "name": "pointerleave",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerleave",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11519.400000095367,
+        "processingEnd": 11519.400000095367,
+        "cancelable": false
+      }
+    },
+    {
+      "name": "pointerleave",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerleave",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11519.400000095367,
+        "processingEnd": 11519.400000095367,
+        "cancelable": false
+      }
+    },
+    {
+      "name": "pointerleave",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerleave",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11519.400000095367,
+        "processingEnd": 11519.599999904633,
+        "cancelable": false
+      }
+    },
+    {
+      "name": "pointerleave",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerleave",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11519.599999904633,
+        "processingEnd": 11519.599999904633,
+        "cancelable": false
+      }
+    },
+    {
+      "name": "pointerover",
+      "duration": 632,
+      "phase": "spotlight",
+      "timing": {
+        "name": "pointerover",
+        "entryType": "event",
+        "startTime": 11468.099999904633,
+        "duration": 632,
+        "navigationId": 2783,
+        "interactionId": 0,
+        "processingStart": 11519.599999904633,
+        "processingEnd": 11519.799999952316,
+        "cancelable": true
+      }
+    }
+  ],
+  "renderer": [
+    {
+      "vendorId": 4318,
+      "deviceId": 7089,
+      "subSysId": 295899196,
+      "revision": 161,
+      "vendorString": "",
+      "deviceString": "NVIDIA Quadro P4000",
+      "driverVendor": "NVIDIA",
+      "driverVersion": "30.0.14.7298"
+    },
+    {
+      "vendorId": 5140,
+      "deviceId": 140,
+      "subSysId": 0,
+      "revision": 0,
+      "vendorString": "",
+      "deviceString": "Microsoft Basic Render Driver",
+      "driverVendor": "",
+      "driverVersion": "10.0.26100.9711"
+    }
+  ],
+  "features": {
+    "2d_canvas": "enabled",
+    "direct_rendering_display_compositor": "disabled_off_ok",
+    "gpu_compositing": "enabled",
+    "multiple_raster_threads": "enabled_on",
+    "opengl": "enabled_on",
+    "rasterization": "enabled",
+    "raw_draw": "disabled_off_ok",
+    "skia_graphite": "disabled_off",
+    "trees_in_viz": "disabled_off",
+    "video_decode": "enabled",
+    "video_encode": "enabled",
+    "webgl": "enabled",
+    "webgpu": "enabled",
+    "webnn": "disabled_off"
+  }
+}

@@ -1,0 +1,36 @@
+:root {
+  color-scheme: dark;
+
+  --color-void: #0b0c10;
+  --color-slate: #15171e;
+  --color-fog: #edeff2;
+  --color-ash: #8a8d98;
+  --color-signal: #17e3c0;
+  --color-ultraviolet: #7b5cff;
+  --color-success: #3ddc97;
+  --color-error: #ff5c5c;
+  --color-warning: #ffb84d;
+
+  --glass-fill: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.16);
+
+  --background-primary: var(--color-void);
+  --surface-elevated: var(--color-slate);
+  --text-primary: var(--color-fog);
+  --text-secondary: var(--color-ash);
+  --focus-ring: var(--color-signal);
+
+  --space-page: clamp(1.25rem, 4vw, 4rem);
+  --radius-panel: 1.5rem;
+  --radius-control: 999rem;
+  --shadow-panel: 0 24px 80px rgba(0, 0, 0, 0.36);
+  --glow-restraint: 0 0 60px rgba(23, 227, 192, 0.14);
+  --signature-gradient: linear-gradient(
+    135deg,
+    var(--color-signal),
+    var(--color-ultraviolet)
+  );
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-standard: 180ms;
+}

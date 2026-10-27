@@ -1,0 +1,264 @@
+/* Fit tools by grouping; preserve the approved icon size and thin Dock. */
+.mobile-navigation .mobile-tools-button {
+  flex: 0 0 44px;
+}
+.dock.application-dock {
+  width: max-content;
+  max-width: none;
+  gap: 7px;
+  padding: 7px 9px 10px;
+}
+.application-dock .dock-group {
+  gap: 8px;
+  flex-shrink: 0;
+}
+.application-dock .dock-item {
+  flex-shrink: 0;
+}
+.application-dock .dock-separator {
+  width: 1px;
+  flex-shrink: 0;
+  margin: 0 3px;
+}
+@media (min-width: 761px) and (max-width: 1000px) {
+  .dock.application-dock,
+  .application-dock .dock-group {
+    gap: 4px;
+  }
+}
+.mac-desktop
+  .app-icon:is(
+    .icon-photoshop,
+    .icon-illustrator,
+    .icon-premierepro,
+    .icon-aftereffects
+  ) {
+  background: transparent;
+  overflow: hidden;
+}
+.mac-desktop
+  .app-icon:is(
+    .icon-photoshop,
+    .icon-illustrator,
+    .icon-premierepro,
+    .icon-aftereffects
+  )
+  > img {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+.mac-desktop
+  .app-icon:is(
+    .icon-figma,
+    .icon-blender,
+    .icon-unrealengine,
+    .icon-cinema4d,
+    .icon-wordpress
+  ) {
+  background: linear-gradient(145deg, #fdfdff, #e9ebf1);
+  border-radius: 22%;
+  overflow: hidden;
+}
+.mac-desktop
+  .app-icon:is(
+    .icon-figma,
+    .icon-blender,
+    .icon-unrealengine,
+    .icon-cinema4d,
+    .icon-wordpress
+  )
+  > img {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+  margin: auto;
+}
+.mac-desktop .app-icon.icon-figma > img {
+  width: 83%;
+  height: 83%;
+}
+.mac-desktop .finder-sidebar .app-icon.icon-wordpress {
+  background: #f8fafc !important;
+  border-radius: 50%;
+}
+.dock-item > .tool-stack-art {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+  padding: 5px;
+  background: linear-gradient(150deg, #f5faff, #a9cae6);
+  border: 0.5px solid #ffffffcc;
+  border-radius: 23%;
+  box-shadow:
+    inset 0 0.5px #fff,
+    0 1px 2px #142a432b;
+}
+.application-dock .tool-stack-art > .app-icon {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 2px;
+  box-shadow: none;
+  will-change: auto;
+}
+.application-dock .tool-stack-art > .app-icon > img {
+  width: 100%;
+  height: 100%;
+}
+.dock-item > .stack-design {
+  background: linear-gradient(150deg, #fff5ee, #e6b9b5);
+}
+.dock-item > .stack-motion {
+  background: linear-gradient(150deg, #f1eaff, #b7a7dd);
+}
+.dock-item > .stack-three-d {
+  background: linear-gradient(150deg, #e9f9fc, #95becf);
+}
+.mac-desktop .dock-stack {
+  inset: auto;
+  bottom: 88px;
+  margin: 0;
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100dvh - 138px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  border: 1px solid var(--overlay-line);
+  background: var(--overlay-paper);
+  color: var(--overlay-ink);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  backdrop-filter: blur(24px) saturate(1.3);
+  transform-origin: bottom center;
+  border-radius: 16px;
+}
+.dock-stack::backdrop {
+  background: #07172b16;
+  backdrop-filter: none;
+}
+.dock-stack-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+.dock-stack-header h2 {
+  font-size: 17px;
+  letter-spacing: -0.025em;
+  margin-top: 5px;
+}
+.dock-stack-header .eyebrow {
+  color: var(--overlay-muted);
+  font-size: 9px;
+}
+.dock-stack .tool-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.tool-tile {
+  position: relative;
+  border-radius: 12px;
+  min-width: 0;
+}
+.tool-open {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 14px 5px 12px;
+  border-radius: 12px;
+  width: 100%;
+  min-height: 102px;
+  color: inherit;
+}
+.tool-open > span:last-child {
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+}
+.tool-tile:hover,
+.tool-tile:focus-within {
+  background: var(--overlay-selection);
+}
+.tool-pin {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  color: var(--overlay-muted);
+  background: var(--overlay-paper);
+}
+.tool-pin:hover,
+.tool-pin[aria-pressed="true"] {
+  color: var(--overlay-ink);
+  background: var(--overlay-selection);
+}
+.dock-stack-hint {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--overlay-muted);
+  border-top: 1px solid var(--overlay-line);
+  padding-top: 13px;
+  margin-top: 14px;
+}
+.dock-pinned-list {
+  display: grid;
+  gap: 9px;
+  margin: 16px 0;
+}
+.dock-pinned-list small {
+  line-height: 1.5;
+}
+.dock-pinned-list > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dock-pinned-list .secondary-button {
+  font-size: 11px;
+  min-height: 30px;
+  padding: 6px 9px;
+}
+.finder-sidebar {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #71829766 transparent;
+}
+.finder-sidebar .tool-section-label {
+  margin-top: 15px;
+}
+.finder-sidebar > .sidebar-label {
+  flex-shrink: 0;
+}
+.mac-desktop.opaque .dock-stack {
+  background: #f4f6f9;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.mac-desktop.dark.opaque .dock-stack {
+  background: #242a33;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .mac-desktop:not(.calm) .tool-open:hover > .app-icon {
+    transform: translateY(-2px);
+  }
+}
+@media (prefers-contrast: more) {
+  .mac-desktop .dock-stack {
+    background: #fff;
+    color: #17202b;
+    backdrop-filter: none;
+  }
+  .mac-desktop.dark .dock-stack {
+    background: #171c23;
+    color: #fff;
+  }
+}

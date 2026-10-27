@@ -1,0 +1,93 @@
+name: Quality checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, typecheck, format, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable pnpm
+        run: |
+          npm install --global corepack@0.36.0
+          corepack enable
+          corepack prepare pnpm@12.15.0 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        run: pnpm lint
+
+      - name: Run typecheck
+        run: pnpm typecheck
+
+      - name: Check desktop behavior
+        run: pnpm check:desktop
+
+      - name: Check enquiry confirmation behavior (no email sent)
+        run: pnpm test:email
+
+      - name: Check analytics consent and metadata privacy
+        run: pnpm test:analytics
+
+      - name: Check deployment gate and weather adapter
+        run: |
+          pnpm test:deployment
+          bash -n scripts/deploy-cpanel.sh
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Build application
+        run: pnpm build
+
+  desktop-browsers:
+    name: Desktop browser and visual regression
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      # Public identifier; localhost is blocked from sending analytics.
+      NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID: GTM-MN7VXD64
+      NEXT_PUBLIC_META_PIXEL_ID: "2306932560092203"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Enable pinned pnpm
+        run: |
+          npm install --global corepack@0.36.0
+          corepack enable
+          corepack prepare pnpm@12.15.0 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium firefox webkit
+      - run: pnpm build
+      - name: Functional and visual checks
+        run: pnpm test:browser --grep-invert "motion stays interactive"
