@@ -64,6 +64,9 @@ test("old collection links migrate and direct contact paths retain their context
   await expect(page.locator(".enquiry-context")).toContainText(
     "eDrive · Figma",
   );
+  // Let automatic Link prefetches finish before tearing down the document.
+  // WebKit reports aborted unload-time fetches as access-control page errors.
+  await page.waitForLoadState("networkidle");
   await page.reload();
   await expect(page.locator(".enquiry-context")).toContainText(
     "eDrive · Figma",
@@ -72,6 +75,7 @@ test("old collection links migrate and direct contact paths retain their context
     .getByRole("link", { name: "WhatsApp Emran — Pakistan" })
     .getAttribute("href");
   expect(new URL(whatsapp!).searchParams.get("text")).toContain("eDrive");
+  await page.waitForLoadState("networkidle");
   await page.goto("/contact?service=business-automation");
   await expect(page).toHaveURL(/\/contact\/service\/business-automation$/);
   await expect(page.getByLabel("What do you have in mind?")).toHaveValue(
